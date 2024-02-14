@@ -1,0 +1,38 @@
+<div class="container">
+    <h1 class="mt-3">
+        Kullanıcı listesi
+    </h1>
+    <div class="d-flex justify-content-end mt-3">
+
+        <a [routerLink]="['/islem/goruntule/kaydet']" class="btn btn-primary">Yeni kullanıcı ekle</a>
+
+    </div>
+
+    <ng-container *ngIf="rehberList$ | async as rehberList">
+
+        <table class="table table-bordered mt-3">
+
+            <thead>
+                <tr>
+                    <th>id</th>
+                    <th>name</th>
+                    <th>surname</th>
+                    <th>email</th>
+                    <th>phone</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let item of rehberList">
+                    <td>{{item.id}}</td>
+                    <td>{{item.name}}</td>
+                    <td>{{item.surname}}</td>
+                    <td>{{item.email}}</td>
+                    <td>{{item.phone}}</td>
+                </tr>
+            </tbody>
+        </table>
+
+
+    </ng-container>
+
+</div>
