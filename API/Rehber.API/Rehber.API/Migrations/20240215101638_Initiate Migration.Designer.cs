@@ -12,8 +12,8 @@ using Rehber.API.Data;
 namespace Rehber.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240213122207_ChangeColumnType")]
-    partial class ChangeColumnType
+    [Migration("20240215101638_Initiate Migration")]
+    partial class InitiateMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -50,6 +50,29 @@ namespace Rehber.API.Migrations
                     b.HasKey("id");
 
                     b.ToTable("rehberIcerikleri");
+                });
+
+            modelBuilder.Entity("Rehber.API.Models.Domain.userIcerik", b =>
+                {
+                    b.Property<Guid>("userId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("userEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("userName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("userPassword")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("userId");
+
+                    b.ToTable("userIcerikleri");
                 });
 #pragma warning restore 612, 618
         }

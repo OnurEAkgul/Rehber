@@ -1,9 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { RehberService } from '../../services/rehber.service';
-import { rehberGoruntule } from '../../models/rehber-goruntule.model';
-import { RehberUpdate } from '../../models/rehber-update.model';
+import { RehberService } from '../services/rehber.service';
+import { rehberGoruntule } from '../models/rehber-goruntule.model';
+import { RehberUpdate } from '../models/rehber-update.model';
 
 @Component({
   selector: 'app-rehber-guncelle',

@@ -18,7 +18,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("RehberConnectionString"));
 });
 
-builder.Services.AddScoped<InterfaceRehberRepository, RehberRepository>();  
+builder.Services.AddScoped<InterfaceRehberRepository, RehberRepository>(); 
+builder.Services.AddScoped<InterfaceUserRepository, UserRepository>();
 
 var app = builder.Build();
 

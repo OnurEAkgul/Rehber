@@ -10,6 +10,8 @@ import { RehberGuncelleComponent } from './features/actions/rehber-guncelle/rehb
 import { RehberSilComponent } from './features/actions/rehber-sil/rehber-sil.component';
 import { FormsModule } from '@angular/forms';
 import {HttpClientModule} from '@angular/common/http';
+import { LoginComponent } from './features/userActions/login/login.component';
+import { SignUpComponent } from './features/userActions/sign-up/sign-up.component';
 
 @NgModule({
   declarations: [
@@ -18,7 +20,9 @@ import {HttpClientModule} from '@angular/common/http';
     RehberListeComponent,
     RehberEkleComponent,
     RehberGuncelleComponent,
-    RehberSilComponent
+    RehberSilComponent,
+    LoginComponent,
+    SignUpComponent
   ],
   imports: [
     BrowserModule,

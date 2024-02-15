@@ -48,6 +48,29 @@ namespace Rehber.API.Migrations
 
                     b.ToTable("rehberIcerikleri");
                 });
+
+            modelBuilder.Entity("Rehber.API.Models.Domain.userIcerik", b =>
+                {
+                    b.Property<Guid>("userId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("userEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("userName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("userPassword")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("userId");
+
+                    b.ToTable("userIcerikleri");
+                });
 #pragma warning restore 612, 618
         }
     }

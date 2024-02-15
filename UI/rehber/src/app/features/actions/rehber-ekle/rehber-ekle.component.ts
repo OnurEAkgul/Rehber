@@ -1,7 +1,7 @@
 import { Component, OnDestroy } from '@angular/core';
-import { rehberRequest } from '../../models/liste-ekle.model';
-import { RehberService } from '../../services/rehber.service';
-import { Subscriber, Subscription } from 'rxjs';
+import { rehberRequest } from '../models/liste-ekle.model';
+import { RehberService } from '../services/rehber.service';
+import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 
 @Component({
@@ -55,12 +55,19 @@ export class RehberEkleComponent implements OnDestroy {
   
     // Continue with the API call if all validations pass
     this.rehberEkleSubscription = this.rehberService
-      .rehberEkle(this.model)
-      .subscribe({
-        next: (response) => {
-          this.router.navigateByUrl('islem/goruntule');
-        },
-      });
+    .rehberEkle(this.model)
+    .subscribe({
+      next: (response) => {
+        this.router.navigateByUrl('islem/goruntule');
+      },
+      // error: (error) => {
+      //   if (error.status === 409) {
+      //     alert('Bu telefon numarası zaten kayıtlı.');
+      //   } else {
+      //     console.error('Unexpected error:', error);
+      //   }
+      // }
+    });
   }
   
   // Helper method to validate name and surname

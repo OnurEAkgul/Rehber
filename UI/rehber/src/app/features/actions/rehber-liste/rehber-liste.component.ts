@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { RehberService } from '../../services/rehber.service';
-import { rehberGoruntule } from '../../models/rehber-goruntule.model';
+import { RehberService } from '../services/rehber.service';
+import { rehberGoruntule } from '../models/rehber-goruntule.model';
 import { Observable } from 'rxjs';
 
 @Component({

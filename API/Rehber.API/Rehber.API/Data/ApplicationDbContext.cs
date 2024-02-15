@@ -11,5 +11,6 @@ namespace Rehber.API.Data
         }
     
         public DbSet<rehberIcerik> rehberIcerikleri { get; set; }
+        public DbSet<userIcerik> userIcerikleri { get;set; }
     }
 }
