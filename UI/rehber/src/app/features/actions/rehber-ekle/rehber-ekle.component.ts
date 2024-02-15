@@ -26,18 +26,34 @@ export class RehberEkleComponent implements OnDestroy {
   onFormSubmit() {
     // Set the formSubmitted flag to true
     this.formSubmitted = true;
-
+  
     // Remove non-numeric characters from the phone number
     this.model.phone = this.model.phone.replace(/[^0-9]/g, '');
-
+  
     // Validate if the phone number is exactly 11 digits and starts with "05"
     if (this.model.phone.length !== 11 || !this.model.phone.startsWith('05')) {
       // Show an error message to the user
       alert('Hatalı bir numara girdiniz lütfen tekrar deneyin');
       return; // Stop the form submission
     }
-
-    // Continue with the API call if the validation passes
+  
+    // Additional validation for name, surname, and email
+    if (!this.isValidName(this.model.name)) {
+      alert('Geçerli bir isim giriniz');
+      return;
+    }
+  
+    if (!this.isValidName(this.model.surname)) {
+      alert('Geçerli bir soyisim giriniz');
+      return;
+    }
+  
+    if (!this.isValidEmail(this.model.email)) {
+      alert('Geçerli bir e-posta adresi giriniz');
+      return;
+    }
+  
+    // Continue with the API call if all validations pass
     this.rehberEkleSubscription = this.rehberService
       .rehberEkle(this.model)
       .subscribe({
@@ -45,6 +61,20 @@ export class RehberEkleComponent implements OnDestroy {
           this.router.navigateByUrl('islem/goruntule');
         },
       });
+  }
+  
+  // Helper method to validate name and surname
+  private isValidName(value: string): boolean {
+    // Add your validation logic here
+    // For example, you can check if the name/surname contains only letters
+    return /^[a-zA-ZğüşöçİĞÜŞÖÇ\s]+$/.test(value);
+  }
+  
+  // Helper method to validate email
+  private isValidEmail(value: string): boolean {
+    // Add your email validation logic here
+    // For simplicity, this example uses a basic email pattern
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
   }
 
   onNumericInputChange(): void {

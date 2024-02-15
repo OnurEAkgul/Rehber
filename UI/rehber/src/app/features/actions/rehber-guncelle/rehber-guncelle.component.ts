@@ -13,35 +13,48 @@ import { RehberUpdate } from '../../models/rehber-update.model';
 export class RehberGuncelleComponent implements OnInit, OnDestroy {
   id: string | null = null;
   kisiBilgi?: rehberGoruntule;
-  formSubmitted: boolean = false; // Track if the form has been submitted
+  formSubmitted: boolean = false;
 
   paramsSubscription?: Subscription;
-  editKisiSubscription?:Subscription;
-  deleteKisiSubscription?:Subscription;
+  editKisiSubscription?: Subscription;
+  deleteKisiSubscription?: Subscription;
 
+  deleteInProgress: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
     private rehberService: RehberService,
-    private router:Router
+    private router: Router
   ) {}
 
   onFormSubmit(): void {
-    // Set the formSubmitted flag to true
     this.formSubmitted = true;
 
-    // Remove non-numeric characters from the phone number
-    if (this.kisiBilgi && this.kisiBilgi.phone) {
-      this.kisiBilgi.phone = this.kisiBilgi.phone.replace(/[^0-9]/g, '');
-
-      // Validate if the phone number is exactly 11 digits and starts with "05"
+    if (this.kisiBilgi) {
       if (
+        !this.kisiBilgi.phone ||
         this.kisiBilgi.phone.length !== 11 ||
-        !this.kisiBilgi.phone.startsWith('05')
+        !this.kisiBilgi.phone.startsWith('05') ||
+        !/^\d+$/.test(this.kisiBilgi.phone.substring(2)) // Check if the remaining part is numeric
       ) {
-        // Show an error message to the user
         alert('Hatalı bir numara girdiniz lütfen tekrar deneyin');
-        return; // Stop the form submission
+        return;
+      }
+
+      // Continue with the rest of your code for name, surname, email validations
+      if (!this.isValidName(this.kisiBilgi?.name)) {
+        alert('Geçerli bir isim giriniz');
+        return;
+      }
+
+      if (!this.isValidName(this.kisiBilgi?.surname)) {
+        alert('Geçerli bir soyisim giriniz');
+        return;
+      }
+
+      if (!this.isValidEmail(this.kisiBilgi?.email)) {
+        alert('Geçerli bir e-posta adresi giriniz');
+        return;
       }
     }
 
@@ -52,48 +65,62 @@ export class RehberGuncelleComponent implements OnInit, OnDestroy {
       phone: this.kisiBilgi?.phone ?? '',
     };
 
-    // console.log(this.kisiBilgi);
-    if(this.id){
-      this.editKisiSubscription= this.rehberService.rehberUpdateID(this.id,rehberUpdate).subscribe({
-        next: (response) =>{
-          this.router.navigateByUrl('islem/goruntule')
-
-        }
-      });
+    if (this.id) {
+      this.editKisiSubscription = this.rehberService
+        .rehberUpdateID(this.id, rehberUpdate)
+        .subscribe({
+          next: (response) => {
+            this.router.navigateByUrl('islem/goruntule');
+          },
+        });
     }
-
   }
 
-  onDelete():void{
-    if(this.id){
-    this.deleteKisiSubscription = this.rehberService.rehberDeleteID(this.id).subscribe({
-      next:(Response) =>{
-        this.router.navigateByUrl('islem/goruntule')
+  onDelete(): void {
+    if (this.id) {
+      const isConfirmed = window.confirm('Are you sure you want to delete this user?');
+
+      if (isConfirmed) {
+        // Set deleteInProgress to true to disable the delete button and show a spinner
+        this.deleteInProgress = true;
+
+        this.deleteKisiSubscription = this.rehberService
+          .rehberDeleteID(this.id)
+          .subscribe({
+            next: (Response) => {
+              this.router.navigateByUrl('islem/goruntule');
+            },
+            complete: () => {
+              // Reset deleteInProgress to false when the deletion is complete
+              this.deleteInProgress = false;
+            },
+          });
       }
+      // If not confirmed, do nothing
+    }
+  }
 
-    });
-  }
-  }
   onNumericInputChange(): void {
-    // Do not check for validation if the form has been submitted
-    if (!this.formSubmitted) {
-      // Remove non-numeric characters from the input
-      if (this.kisiBilgi && this.kisiBilgi.phone) {
-        this.kisiBilgi.phone = this.kisiBilgi.phone.replace(/[^0-9]/g, '');
-
-        // Check if the phone number starts with "05" and is between 2 and 11 digits
-        const isValidLength =
-          this.kisiBilgi.phone.length >= 2 && this.kisiBilgi.phone.length <= 11;
-        const isValidStart = this.kisiBilgi.phone.startsWith('05');
-
-        // Update the UI or handle the error based on validation result
-        if (isValidLength && !isValidStart) {
-          // Show an error message to the user or handle it according to your UI
-          alert('Hatalı bir numara girdiniz lütfen tekrar deneyin');
-        }
+    if (!this.formSubmitted && typeof this.kisiBilgi?.phone === 'number') {
+      // Use explicit type assertion to ensure TypeScript understands it's a number
+      const numericPhone: string = (this.kisiBilgi.phone as number).toString();
+  
+      // Check if the phone number starts with "05" and is between 2 and 11 digits
+      const isValidLength: boolean = numericPhone.length >= 2 && numericPhone.length <= 11;
+      const isValidStart: boolean = numericPhone.startsWith('05');
+  
+      // Update the UI or handle the error based on validation result
+      if (isValidLength && !isValidStart) {
+        alert('Hatalı bir numara girdiniz lütfen tekrar deneyin');
+        return;
       }
+  
+      // Update the model with the numeric value
+      this.kisiBilgi.phone = numericPhone;
     }
   }
+  
+  
 
   ngOnDestroy(): void {
     this.paramsSubscription?.unsubscribe();
@@ -115,5 +142,13 @@ export class RehberGuncelleComponent implements OnInit, OnDestroy {
         }
       },
     });
+  }
+
+  private isValidName(value: string | undefined): boolean {
+    return !!value && /^[a-zA-ZğüşöçİĞÜŞÖÇ\s]+$/.test(value);
+  }
+
+  private isValidEmail(value: string | undefined): boolean {
+    return !!value && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
   }
 }

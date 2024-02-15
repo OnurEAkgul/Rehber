@@ -13,6 +13,7 @@
         />
       </div>
     </div>
+
     <form #form="ngForm" (ngSubmit)="onFormSubmit()" class="row g-3">
       <div class="col-md-6">
         <div class="mt-3">
@@ -24,7 +25,12 @@
             name="guncelleAdi"
             placeholder="{{ kisiBilgi.name }}"
             [(ngModel)]="kisiBilgi.name"
+            #nameInput="ngModel"
+            required
           />
+          <div *ngIf="formSubmitted && nameInput.invalid" class="text-danger">
+            Geçerli bir isim giriniz
+          </div>
         </div>
       </div>
 
@@ -38,13 +44,18 @@
             name="guncelleSoyadi"
             placeholder="{{ kisiBilgi.surname }}"
             [(ngModel)]="kisiBilgi.surname"
+            #surnameInput="ngModel"
+            required
           />
+          <div *ngIf="formSubmitted && surnameInput.invalid" class="text-danger">
+            Geçerli bir soyisim giriniz
+          </div>
         </div>
       </div>
+
       <div class="mt-2">
         <div class="mt-3">
           <label for="guncelleEmail" class="form-label"> E-posta adresi </label>
-
           <input
             type="text"
             id="guncelleEmail"
@@ -52,22 +63,28 @@
             name="guncelleEmail"
             placeholder="{{ kisiBilgi.email }}"
             [(ngModel)]="kisiBilgi.email"
+            #emailInput="ngModel"
+            required
           />
+          <div *ngIf="formSubmitted && emailInput.invalid" class="text-danger">
+            Geçerli bir e-posta adresi giriniz
+          </div>
         </div>
       </div>
+
       <div class="mt-2">
         <div class="mt-3">
           <label class="form-label" for="guncellePhone">Telefon numarası</label>
-
           <input
-            type="text"
-            id="guncellePhone"
-            class="form-control required"
-            name="guncellePhone"
-            placeholder="{{ kisiBilgi.phone }}"
-            [(ngModel)]="kisiBilgi.phone"
-            (ngModelChange)="onNumericInputChange()"
-          />
+          pattern="[0-9]{3}[0-9]{3}[0-9]{4}"
+          type="tel"
+          id="eklePhone"
+          class="form-control required"
+          name="eklePhone"
+          placeholder="Telefon numarası girin"
+          [(ngModel)]="kisiBilgi.phone"
+          (ngModelChange)="onNumericInputChange()"
+        />
         </div>
       </div>
 
@@ -75,16 +92,21 @@
         <button type="submit" class="btn btn-primary">
           Kullanıcı bilgilerini güncelle
         </button>
-        <button type="button" class="btn btn-danger ms-3"
-        (click)="onDelete()"
+        <button
+          type="button"
+          class="btn btn-danger ms-3"
+          (click)="onDelete()"
+          [disabled]="deleteInProgress"
         >
+          <span *ngIf="deleteInProgress" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
           Kullanıcıyı sil
         </button>
       </div>
-    </form>
-  </ng-container>
+      </form>
+      </ng-container>
+      
+      <ng-template #notFound>
+        <div class="alert alert-warning mt-3" role="alert">Kişi Bulunamadı</div>
+      </ng-template>
+      </div>
 
-  <ng-template #notFound>
-    <div class="alert alert-warning mt-3" role="alert">Kişi Bulunamadı</div>
-  </ng-template>
-</div>
