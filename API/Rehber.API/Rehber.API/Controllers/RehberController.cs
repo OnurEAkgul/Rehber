@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Azure.Core;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Rehber.API.Data;
 using Rehber.API.Models.Domain;
@@ -22,39 +24,64 @@ namespace Rehber.API.Controllers
             this.rehberRepository = rehberRepository;
         }
 
+        //POST METHODU https://localhost:7195/api/Rehber
 
-
-        [HttpPost]
-        public async Task<IActionResult> CreateRehber([FromBody] CreateRehberRequest request)
+        [HttpPost("{userId:guid}")]
+        // [Route("{userId:guid}")]
+         [Authorize(Roles = "userRole")]
+        public async Task<IActionResult> CreateRehber([FromBody] CreateRehberRequest request, [FromRoute] Guid userId)
         {
-            //DTO dan domain modeline
+            // DTO dan domain modeline
             var rehber = new rehberIcerik
             {
                 name = request.name,
                 surname = request.surname,
                 email = request.email,
-                phone = request.phone
+                phone = request.phone,
+                userId = userId // Use userId from the route
             };
-
 
             await rehberRepository.CreateAsync(rehber);
 
-            //Domain modelinden DTO ya
-
+            // Domain modelinden DTO ya
             var response = new RehberDTO
             {
                 id = rehber.id,
                 name = rehber.name,
                 surname = rehber.surname,
                 email = rehber.email,
-                phone = rehber.phone
+                phone = rehber.phone,
+                userId = userId // Use userId from the route
             };
 
-            return Ok();
+            return Ok(response);
         }
 
-        //Get methodu https://localhost:7195/api/Rehber
-        [HttpGet]
+        //GET METHODU https://localhost:7195/api/Rehber
+        [HttpGet("{userId:guid}")]
+        //[Route("{userId:guid}")]
+        [Authorize(Roles = "userRole")]
+        public async Task<IActionResult> GetRehberWhereId([FromRoute] Guid userId)
+        {
+            var rehber = await rehberRepository.GetRehberWhereIdAsync(userId);
+
+            // Map domain model to DTO
+            var response = rehber.Select(item => new RehberDTO
+            {
+                id = item.id,
+                name = item.name,
+                surname = item.surname,
+                email = item.email,
+                phone = item.phone,
+                userId = item.userId
+            }).ToList();
+
+            return Ok(response);
+        }
+
+        //GET METHODU TÜM HEPSİNİ GETİRİYOR https://localhost:7195/api/Rehber/all
+        [HttpGet ("all")]
+        [Authorize(Roles = "adminRole")]
         public async Task<IActionResult> GetRehber()
         {
             var rehber = await rehberRepository.GetRehberAsync();
@@ -72,17 +99,20 @@ namespace Rehber.API.Controllers
                     name = item.name,
                     surname = item.surname,
                     email = item.email,
-                    phone = item.phone }
+                    phone = item.phone,
+                    userId = item.userId
+                }
                 );
             }
 
             return Ok(response);
         }
+        
 
-
-        //Get methodu https://localhost:7195/api/Rehber/{id}
+        //IDLİ GET METHODU IDYE GÖRE GETİRİYOR https://localhost:7195/api/Rehber/userId/{id}
         [HttpGet]
-        [Route("{id:Guid}")]
+        [Authorize(Roles = "userRole")]
+        [Route("{userId:guid}/{id:Guid}")]
         public async Task<IActionResult> GetRehberById([FromRoute]Guid id)
         {
             var existingRehber = await rehberRepository.GetRehberById(id);
@@ -98,7 +128,8 @@ namespace Rehber.API.Controllers
                 name = existingRehber.name,
                 surname=existingRehber.surname,
                 email = existingRehber.email,
-                phone = existingRehber.phone
+                phone = existingRehber.phone,
+                userId = existingRehber.userId
             };
             
             
@@ -106,8 +137,9 @@ namespace Rehber.API.Controllers
 
         }
 
-        //Put methodu https://localhost:7195/api/Rehber/{id}
+        //IDLİ PUT METHODU IDYE GÖRE GÜNCELLİYOR https://localhost:7195/api/Rehber/{id}
         [HttpPut]
+        [Authorize(Roles = "userRole")]
         [Route("{id:Guid}")]
         public async Task<IActionResult> UpdateRehberById([FromRoute]Guid id, UpdateRehberRequestDto request)
         {
@@ -119,7 +151,8 @@ namespace Rehber.API.Controllers
                 name = request.name,
                 surname = request.surname,
                 email = request.email,
-                phone = request.phone
+                phone = request.phone,
+                
             };
 
             Rehber = await rehberRepository.UpdateAsync(Rehber);
@@ -136,15 +169,17 @@ namespace Rehber.API.Controllers
                 name = Rehber.name,
                 surname=Rehber.surname,
                 email = Rehber.email,
-                phone = Rehber.phone
+                phone = Rehber.phone,
+                userId = Rehber.userId
             };
 
 
             return Ok(response);
         }
 
-        //Delete methodu https://localhost:7195/api/Rehber/{id}
+        //IDLİ DELETE METHODU IDYE GÖRE SİLİYOR https://localhost:7195/api/Rehber/{id}
         [HttpDelete]
+        [Authorize(Roles = "userRole")]
         [Route("{id:Guid}")]
         public async Task<IActionResult> DeleteRehber([FromRoute] Guid id)
         {

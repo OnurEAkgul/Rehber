@@ -44,7 +44,12 @@ namespace Rehber.API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("userId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("id");
+
+                    b.HasIndex("userId");
 
                     b.ToTable("rehberIcerikleri");
                 });
@@ -70,6 +75,22 @@ namespace Rehber.API.Migrations
                     b.HasKey("userId");
 
                     b.ToTable("userIcerikleri");
+                });
+
+            modelBuilder.Entity("Rehber.API.Models.Domain.rehberIcerik", b =>
+                {
+                    b.HasOne("Rehber.API.Models.Domain.userIcerik", "userIcerik")
+                        .WithMany("RehberIcerikList")
+                        .HasForeignKey("userId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("userIcerik");
+                });
+
+            modelBuilder.Entity("Rehber.API.Models.Domain.userIcerik", b =>
+                {
+                    b.Navigation("RehberIcerikList");
                 });
 #pragma warning restore 612, 618
         }

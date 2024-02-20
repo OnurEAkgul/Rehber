@@ -12,6 +12,8 @@ import { FormsModule } from '@angular/forms';
 import {HttpClientModule} from '@angular/common/http';
 import { LoginComponent } from './features/userActions/login/login.component';
 import { SignUpComponent } from './features/userActions/sign-up/sign-up.component';
+import { AdminPanelComponent } from './features/adminActions/admin-panel/admin-panel.component';
+import { UserInfoComponent } from './features/userActions/userInfo/user-info/user-info.component';
 
 @NgModule({
   declarations: [
@@ -22,7 +24,9 @@ import { SignUpComponent } from './features/userActions/sign-up/sign-up.componen
     RehberGuncelleComponent,
     RehberSilComponent,
     LoginComponent,
-    SignUpComponent
+    SignUpComponent,
+    AdminPanelComponent,
+    UserInfoComponent
   ],
   imports: [
     BrowserModule,

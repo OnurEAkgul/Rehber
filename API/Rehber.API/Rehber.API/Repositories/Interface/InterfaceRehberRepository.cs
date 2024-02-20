@@ -8,7 +8,10 @@ namespace Rehber.API.Repositories.Interface
         Task<rehberIcerik> CreateAsync(rehberIcerik rehber);
 
         Task<IEnumerable<rehberIcerik>> GetRehberAsync();
-
+        
+        // BURASI DAHA SONRA KULLANICININ VERİSİ ALINARAK REHBER GÖSTERMEK İÇİN KULLANILACAK
+        Task<IEnumerable<rehberIcerik>> GetRehberWhereIdAsync(Guid userId);
+        
         Task<rehberIcerik?> GetRehberById(Guid id);
 
         Task<rehberIcerik?> UpdateAsync(rehberIcerik rehber);

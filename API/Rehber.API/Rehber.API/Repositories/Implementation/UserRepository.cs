@@ -13,12 +13,55 @@ namespace Rehber.API.Repositories.Implementation
         {
             this.dbContext = dbContext;
         }
+
+        //USER OLUŞTUR
         public async Task<userIcerik> CreateAsync(userIcerik userIcerik)
         {
-            await dbContext.userIcerikleri.AddAsync(userIcerik);
+            await dbContext.userIcerik.AddAsync(userIcerik);
             await dbContext.SaveChangesAsync();
 
             return userIcerik;
+        }
+
+        //İD İLE USER VERİSİ SİL
+        public async Task<userIcerik?> DeleteAsync(Guid id)
+        {
+            var existingKisi = await dbContext.userIcerik.FirstOrDefaultAsync(x => x.userId == id);
+
+            if (existingKisi is null)
+            {
+                return null;
+            }
+
+            dbContext.userIcerik.Remove(existingKisi);
+            await dbContext.SaveChangesAsync();
+            return existingKisi;
+        }
+
+        //TÜM USER VERİLERİNİ GETİR
+        public async Task<IEnumerable<userIcerik>> GetUserAsync()
+        {
+            return await dbContext.userIcerik.ToListAsync();
+        }
+
+        //ID İLE USER VERİSİ GETİR
+        public async Task<userIcerik?> GetUserById(Guid id)
+        {
+            return await dbContext.userIcerik.FirstOrDefaultAsync(x => x.userId == id);
+        }
+
+        //GÜNCELLE
+        public async Task<userIcerik?> UpdateAsync(userIcerik userIcerik)
+        {
+            var existingKisi = await dbContext.userIcerik.FirstOrDefaultAsync(x => x.userId == userIcerik.userId);
+
+            if (existingKisi != null)
+            {
+                dbContext.Entry(existingKisi).CurrentValues.SetValues(userIcerik);
+                await dbContext.SaveChangesAsync();
+                return existingKisi;
+            }
+            return null;
         }
     }
 }

@@ -1,26 +1,40 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { rehberRequest } from '../models/liste-ekle.model';
 import { RehberService } from '../services/rehber.service';
 import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
+import { UserService } from '../../userActions/user.service';
+import { userInformation } from '../../userActions/models/userInfo.model';
 
 @Component({
   selector: 'app-rehber-ekle',
   templateUrl: './rehber-ekle.component.html',
   styleUrls: ['./rehber-ekle.component.css'],
 })
-export class RehberEkleComponent implements OnDestroy {
+export class RehberEkleComponent implements OnDestroy,OnInit {
   model: rehberRequest;
   private rehberEkleSubscription?: Subscription;
   formSubmitted: boolean = false; // Track if the form has been submitted
-
-  constructor(private rehberService: RehberService, private router: Router) {
+  user?: userInformation;
+  constructor(private rehberService: RehberService, private router: Router,private userService:UserService) {
     this.model = {
       name: '',
       surname: '',
       email: '',
       phone: '',
+      userId: '',
     };
+  }
+
+  ngOnInit(): void {
+    this.user = this.userService.getUserFromLocalStorage();
+    console.log('User from local storage:', this.user);
+  
+    if (this.user) {
+      console.log('User ID:', this.user.userId);
+    } else {
+      console.log('User is undefined');
+    }
   }
 
   onFormSubmit() {
@@ -53,9 +67,11 @@ export class RehberEkleComponent implements OnDestroy {
       return;
     }
   
+
+    if(this.user){
     // Continue with the API call if all validations pass
     this.rehberEkleSubscription = this.rehberService
-    .rehberEkle(this.model)
+    .rehberEkle(this.model,this.user.userId)
     .subscribe({
       next: (response) => {
         this.router.navigateByUrl('islem/goruntule');
@@ -68,7 +84,7 @@ export class RehberEkleComponent implements OnDestroy {
       //   }
       // }
     });
-  }
+  }}
   
   // Helper method to validate name and surname
   private isValidName(value: string): boolean {

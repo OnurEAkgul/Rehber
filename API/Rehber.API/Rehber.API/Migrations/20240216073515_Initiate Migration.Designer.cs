@@ -12,7 +12,7 @@ using Rehber.API.Data;
 namespace Rehber.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240215101638_Initiate Migration")]
+    [Migration("20240216073515_Initiate Migration")]
     partial class InitiateMigration
     {
         /// <inheritdoc />
@@ -47,7 +47,15 @@ namespace Rehber.API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("userIcerikuserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("userId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("id");
+
+                    b.HasIndex("userIcerikuserId");
 
                     b.ToTable("rehberIcerikleri");
                 });
@@ -73,6 +81,22 @@ namespace Rehber.API.Migrations
                     b.HasKey("userId");
 
                     b.ToTable("userIcerikleri");
+                });
+
+            modelBuilder.Entity("Rehber.API.Models.Domain.rehberIcerik", b =>
+                {
+                    b.HasOne("Rehber.API.Models.Domain.userIcerik", "userIcerik")
+                        .WithMany("RehberIcerikList")
+                        .HasForeignKey("userIcerikuserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("userIcerik");
+                });
+
+            modelBuilder.Entity("Rehber.API.Models.Domain.userIcerik", b =>
+                {
+                    b.Navigation("RehberIcerikList");
                 });
 #pragma warning restore 612, 618
         }

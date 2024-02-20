@@ -1,4 +1,6 @@
-﻿namespace Rehber.API.Models.DTO
+﻿using Rehber.API.Models.Domain;
+
+namespace Rehber.API.Models.DTO
 {
     public class signUpRequestDTO
     {

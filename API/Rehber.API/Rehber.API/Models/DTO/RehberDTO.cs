@@ -9,6 +9,8 @@
 
         public string email { get; set; } 
 
-        public string phone  { get; set; }   
+        public string phone  { get; set; }
+
+        public Guid userId { get; set; }
     }
 }
