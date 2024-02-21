@@ -45,6 +45,7 @@ export class SignUpComponent implements OnDestroy {
         next: (response) => {
           alert('Sign-up successful!'); // Provide a success message
 
+          this.router.navigateByUrl('userislem/giris')
           console.log(response)
           // Now you can use the retrieved userId for navigation
          // const userId = response.userId;

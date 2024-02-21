@@ -1,5 +1,5 @@
-﻿using Azure.Core;
-using Microsoft.AspNetCore.Http;
+﻿
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -21,11 +21,12 @@ namespace Rehber.API.Controllers
         private readonly ApplicationDbContext dbContext;
         private readonly InterfaceTokenRepository tokenRepository;
 
-        public userController(UserManager<IdentityUser> userManager, ApplicationDbContext dbContext, InterfaceTokenRepository tokenRepository)
+        public userController(UserManager<IdentityUser> userManager, ApplicationDbContext dbContext, InterfaceTokenRepository tokenRepository, InterfaceUserRepository userRepository)
         {
             this.userManager = userManager;
             this.dbContext = dbContext;
             this.tokenRepository = tokenRepository;
+            this.userRepository = userRepository;
         }
 
 
@@ -81,7 +82,22 @@ namespace Rehber.API.Controllers
                 Email = request.userEmail?.Trim()
             };
 
+            var existingUser = await userManager.FindByEmailAsync(request.userEmail);
+            if (existingUser != null)
+            {
+                // Handle duplicate email
+                ModelState.AddModelError("hata", "Email is already in use");
+                return ValidationProblem(ModelState);
+            }
+
+
+
             var identityResult = await userManager.CreateAsync(identityUser, request.userPassword);
+
+
+
+
+
 
             if (identityResult.Succeeded)
             {
@@ -111,9 +127,99 @@ namespace Rehber.API.Controllers
                 return ValidationProblem(ModelState);
             }
         }
+
+
+        // PUT METODU UPDATE https://localhost:7195/api/user/UpdateUser/{userId}
         [HttpPut]
+        [Authorize(Roles = "adminRole, userRole")]
         [Route("UpdateUser/{userId:guid}")]
-        public async Task<IActionResult> UpdateUser(Guid userId, [FromBody] UpdateUserRequestDTO request)
+        public async Task<IActionResult> UpdateUser([FromRoute] Guid userId, UpdateUserRequestDTO request)
+        {
+            using (var transaction = await dbContext.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    // Update IdentityUser
+                    var identityUser = await userManager.FindByIdAsync(userId.ToString());
+                    if (identityUser == null)
+                    {
+                        return NotFound("User not found");
+                    }
+
+                    // Check if the user has the "adminRole"
+                    bool isAdmin = await userManager.IsInRoleAsync(identityUser, "adminRole");
+
+                    // Allow passwordless update for users with "adminRole"
+                    if (!isAdmin || (isAdmin && string.IsNullOrEmpty(request.newPassword)))
+                    {
+                        // Check if the current password matches
+                        if (!await userManager.CheckPasswordAsync(identityUser, request.currentPassword))
+                        {
+                            // Current password is incorrect
+                            return BadRequest("Current password is incorrect");
+                        }
+                    }
+
+                    // Continue with the rest of your existing logic...
+                    identityUser.UserName = request.userName?.Trim();
+                    identityUser.Email = request.userEmail?.Trim();
+
+                    // Check if the user wants to change the password
+                    if (!string.IsNullOrEmpty(request.newPassword))
+                    {
+                        // If newPassword is provided, update the password in IdentityUser
+                        var newPasswordHash = userManager.PasswordHasher.HashPassword(identityUser, request.newPassword);
+                        identityUser.PasswordHash = newPasswordHash;
+                    }
+
+                    var identityResult = await userManager.UpdateAsync(identityUser);
+                    if (!identityResult.Succeeded)
+                    {
+                        // Handle update failure
+                        throw new Exception("Failed to update IdentityUser");
+                    }
+
+                    // Update userIcerik
+                    var userIcerik = await dbContext.userIcerik.FirstOrDefaultAsync(u => u.userId == userId);
+                    if (userIcerik == null)
+                    {
+                        return NotFound("UserIcerik not found");
+                    }
+
+                    userIcerik.userName = request.userName?.Trim();
+                    userIcerik.userEmail = request.userEmail?.Trim();
+
+                    // Check if the user wants to change the password
+                    if (!string.IsNullOrEmpty(request.newPassword))
+                    {
+                        // If newPassword is provided, update the password in userIcerik
+                        userIcerik.userPassword = request.newPassword;
+                    }
+
+                    // Update other properties as needed
+                    await dbContext.SaveChangesAsync();
+
+                    // Commit the transaction
+                    await transaction.CommitAsync();
+
+                    return Ok(request);
+                }
+                catch (Exception)
+                {
+                    // An error occurred, rollback the transaction
+                    await transaction.RollbackAsync();
+                    throw;
+                }
+            }
+        }
+
+
+        /*
+        //PUT METODU UPDATE     https://localhost:7195/api/user/UpdateUser/{userId}
+        [HttpPut]
+        // [Authorize(Roles = "userRole")]
+        [Route("UpdateUser/{userId:guid}")]
+        public async Task<IActionResult> UpdateUser([FromRoute] Guid userId, UpdateUserRequestDTO request)
         {
             using (var transaction = await dbContext.Database.BeginTransactionAsync())
             {
@@ -128,6 +234,7 @@ namespace Rehber.API.Controllers
 
                     identityUser.UserName = request.userName?.Trim();
                     identityUser.Email = request.userEmail?.Trim();
+
 
                     var identityResult = await userManager.UpdateAsync(identityUser);
                     if (!identityResult.Succeeded)
@@ -162,117 +269,114 @@ namespace Rehber.API.Controllers
                 }
             }
         }
+        */
 
-        /*
-
-        //POST METHODU https://localhost:7195/api/user
-        [HttpPost]
-
-        public async Task<IActionResult> CreateUser([FromBody] signUpRequestDTO request)
+        //GET METODU USERID ILE https://localhost:7195/api/user/{userId}
+        [HttpGet]
+        [Authorize(Roles = "userRole")]
+        [Route("{userId:guid}")]
+        public async Task<IActionResult> GetUserByUserId([FromRoute] Guid userId)
         {
+            var existingUser = await userManager.FindByIdAsync(userId.ToString());
 
-
-            //dtodan domain dönüşümü
-            var userIcerik = new userIcerik
+            if (existingUser == null)
             {
-                userName = request.userName?.Trim(),
-                userEmail = request.userEmail?.Trim(),
-                userPassword = request.userPassword?.Trim()
-            };
+                return NotFound();
+            }
 
-
-            await userRepository.CreateAsync(userIcerik);
-
-            //domainden dtoya dönüşüm
+            // Retrieve userIcerik
+            var userIcerik = await dbContext.userIcerik.FirstOrDefaultAsync(u => u.userId == userId);
+            if (userIcerik == null)
+            {
+                return NotFound("UserIcerik not found");
+            }
 
             var response = new UserDTO
             {
-                userId = userIcerik.userId,
-                userName = userIcerik.userName?.Trim(),
-                userEmail = userIcerik.userEmail?.Trim(),
-                userPassword = userIcerik.userPassword?.Trim()
+                userId = Guid.Parse(existingUser.Id),
+                userName = existingUser.UserName ?? "",
+                userEmail = existingUser.Email ?? "",
+                userPassword = userIcerik.userPassword,
             };
+
             return Ok(response);
         }
 
-        //GET METHODU https://localhost:7195/api/user
-        [HttpGet]
-        public async Task<IActionResult> GetUser()
+        [HttpGet("all")]
+        [Authorize(Roles = "adminRole")]
+        public async Task<IActionResult> getAllUsers()
         {
-            var user = await userRepository.GetUserAsync();
+            var userManagerUsers = await userManager.Users.ToListAsync();
+            var userRepoUsers = await userRepository.GetUserAsync();
 
-            //Map domain modelden DTO ya
-
-            var response = new List<UserDTO>();
-
-            //veri tabanında var olan veri boyunca 
-            foreach (var item in user)
+            if (userManagerUsers == null || userRepoUsers == null)
             {
-
+                return NotFound();
+            }
+            var response = new List<UserDTO>();
+            foreach (var item in userRepoUsers)
+            {
                 response.Add(new UserDTO
                 {
                     userId = item.userId,
                     userName = item.userName,
-                    userPassword= item.userPassword,
-                    userEmail = item.userEmail
-                }
-                );
-            }
+                    userEmail = item.userEmail,
+                    userPassword = item.userPassword,
 
+                });
+
+
+            }
             return Ok(response);
         }
 
-
-        //IDLİ GET METHODU https://localhost:7195/api/user/{id}
-        [HttpGet]
-        [Route("{id:Guid}")]
-        public async Task<IActionResult> GetUserById([FromRoute] Guid id)
-        {
-            var existingRehber = await userRepository.GetUserById(id);
-
-            if (existingRehber == null)
-            {
-                return NotFound();
-            }
-
-            var response = new UserDTO
-            {
-
-                userId = existingRehber.userId,
-                userName = existingRehber.userName,
-                userPassword = existingRehber.userPassword,
-                userEmail = existingRehber.userEmail
-            };
-
-
-            return Ok(response);
-
-        }
-
-
-
-        //IDLİ DELETE METHODU https://localhost:7195/api/Rehber/{id}
+        // DELETE METODU https://localhost:7195/api/user/DeleteUser/{userId}
         [HttpDelete]
-        [Route("{id:Guid}")]
-        public async Task<IActionResult> DeleteRehber([FromRoute] Guid id)
+        [Authorize(Roles = "userRole")]
+        [Route("DeleteUser/{userId:guid}")]
+        public async Task<IActionResult> DeleteUser([FromRoute] Guid userId)
         {
-            var user = await userRepository.DeleteAsync(id);
-
-            if (user is null)
+            using (var transaction = await dbContext.Database.BeginTransactionAsync())
             {
-                return NotFound();
+                try
+                {
+                    // Find the IdentityUser
+                    var identityUser = await userManager.FindByIdAsync(userId.ToString());
+                    if (identityUser == null)
+                    {
+                        return NotFound("User not found");
+                    }
+
+                    // Check if the current user has the permission to delete
+                    var userIcerik = await dbContext.userIcerik.FirstOrDefaultAsync(u => u.userId == userId);
+
+                    // Skip ownership check for administrators
+                    if (userIcerik.AspNetUserId != identityUser.Id)
+                    {
+                        return Forbid(); // User is not allowed to delete other users
+                    }
+
+                    // Delete IdentityUser (cascade delete will handle related entities)
+                    var identityResult = await userManager.DeleteAsync(identityUser);
+                    if (!identityResult.Succeeded)
+                    {
+                        // Handle delete failure
+                        throw new Exception("Failed to delete IdentityUser");
+                    }
+
+                    // Commit the transaction
+                    await transaction.CommitAsync();
+
+                    return Ok(new { Message = "User deleted successfully" });
+                }
+                catch (Exception)
+                {
+                    // An error occurred, rollback the transaction
+                    await transaction.RollbackAsync();
+                    throw;
+                }
             }
-            var response = new UserDTO
-            {
-                userId = id,
-                userName = user.userName,
-                userPassword = user.userPassword,
-                userEmail = user.userEmail,
-            };
-
-            return Ok(response);
         }
-    */
     }
 }
 

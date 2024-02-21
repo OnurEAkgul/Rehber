@@ -9,11 +9,14 @@ import { RehberEkleComponent } from './features/actions/rehber-ekle/rehber-ekle.
 import { RehberGuncelleComponent } from './features/actions/rehber-guncelle/rehber-guncelle.component';
 import { RehberSilComponent } from './features/actions/rehber-sil/rehber-sil.component';
 import { FormsModule } from '@angular/forms';
-import {HttpClientModule} from '@angular/common/http';
+import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import { LoginComponent } from './features/userActions/login/login.component';
 import { SignUpComponent } from './features/userActions/sign-up/sign-up.component';
 import { AdminPanelComponent } from './features/adminActions/admin-panel/admin-panel.component';
 import { UserInfoComponent } from './features/userActions/userInfo/user-info/user-info.component';
+import { AuthInterceptor } from './core/interceptors/auth.interceptor';
+import { AdminUserUpdateComponent } from './features/adminActions/admin-user-update/admin-user-update.component';
+import { AdminRehberUpdateComponent } from './features/adminActions/admin-rehber-update/admin-rehber-update.component';
 
 @NgModule({
   declarations: [
@@ -26,7 +29,9 @@ import { UserInfoComponent } from './features/userActions/userInfo/user-info/use
     LoginComponent,
     SignUpComponent,
     AdminPanelComponent,
-    UserInfoComponent
+    UserInfoComponent,
+    AdminUserUpdateComponent,
+    AdminRehberUpdateComponent
   ],
   imports: [
     BrowserModule,
@@ -34,7 +39,11 @@ import { UserInfoComponent } from './features/userActions/userInfo/user-info/use
     FormsModule,
     HttpClientModule
   ],
-  providers: [],
+  providers: [{
+    provide: HTTP_INTERCEPTORS,
+    useClass: AuthInterceptor,
+    multi: true
+  }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

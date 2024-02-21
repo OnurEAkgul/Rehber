@@ -27,12 +27,9 @@ constructor(private userService:UserService,  private router: Router, private co
     this.formSubmitted = true;
     // You can add further validation and sign-in logic here.
     if (this.isValidForm()) {
-      // Perform sign-in logic, e.g., send data to server or handle authentication
-      
       this.userService.userLogin(this.model).subscribe({
-        next:(response)=>{
-          //console.log('Sign in successful:', response);
-          //set auth cookie first
+        next: (response) => {
+          // Alert for successful login
           this.cookieService.set('Authorization',`Bearer ${response.token}`,
           undefined,'/',undefined,true,'Strict');
 
@@ -43,10 +40,31 @@ constructor(private userService:UserService,  private router: Router, private co
             role: response.role,
             token: response.token, 
           });
-          
+          if(response.role.includes('adminRole')){
+            this.router.navigate(['admin/islem']);  
+            alert('Login successful!');
+          }
+          else{
+          alert('Login successful!');
           this.router.navigate(['islem/goruntule',response.userId]);
+        }
          // this.router.navigate(['/userislem/info', response.userId]);
 
+         
+          
+          // Your existing success logic here
+        },
+        error: (error) => {
+          console.error('Sign in failed:', error);
+
+          // Provide user-friendly error messages based on the error received
+          if (error.status === 401) {
+            // Alert for invalid credentials
+            alert('Invalid email or password');
+          } else {
+            // Alert for other errors
+            alert('Sign in failed. Please try again.');
+          }
         }
       });
     }

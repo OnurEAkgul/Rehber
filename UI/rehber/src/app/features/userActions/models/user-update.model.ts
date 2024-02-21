@@ -1,5 +1,6 @@
 export interface UserUpdate{
-    userName:string
-    userPassword:string,
-    userEmail:string,
+    userName: string;
+  userEmail: string;
+  newPassword?: string; // Optional property
+  currentPassword: string;
 }

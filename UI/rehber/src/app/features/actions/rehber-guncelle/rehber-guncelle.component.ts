@@ -17,7 +17,7 @@ export class RehberGuncelleComponent implements OnInit, OnDestroy {
   kisiBilgi?: rehberGoruntule;
   formSubmitted: boolean = false;
   user?: userInformation;
-
+  
   paramsSubscription?: Subscription;
   editKisiSubscription?: Subscription;
   deleteKisiSubscription?: Subscription;
@@ -34,6 +34,7 @@ export class RehberGuncelleComponent implements OnInit, OnDestroy {
   onFormSubmit(): void {
     this.formSubmitted = true;
 
+    this.user = this.userService.getUserFromLocalStorage();
     if (this.kisiBilgi) {
       if (
         !this.kisiBilgi.phone ||
@@ -75,7 +76,10 @@ export class RehberGuncelleComponent implements OnInit, OnDestroy {
         .rehberUpdateID(this.id, rehberUpdate)
         .subscribe({
           next: (response) => {
-            this.router.navigateByUrl('islem/goruntule');
+            console.log(this.kisiBilgi?.userId);
+            console.log(this.user?.userId);
+            
+            this.router.navigateByUrl(`islem/goruntule/${this.user?.userId}`);
           },
         });
     }
@@ -93,7 +97,7 @@ export class RehberGuncelleComponent implements OnInit, OnDestroy {
           .rehberDeleteID(this.id)
           .subscribe({
             next: (Response) => {
-              this.router.navigateByUrl('islem/goruntule');
+              this.router.navigateByUrl(`islem/goruntule/${this.user?.userId}`);
             },
             complete: () => {
               // Reset deleteInProgress to false when the deletion is complete
@@ -136,12 +140,12 @@ export class RehberGuncelleComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
 
     this.user = this.userService.getUserFromLocalStorage();
-    console.log('User from local storage:', this.user);
+   // console.log('User from local storage:', this.user);
   
     if (this.user) {
-      console.log('User ID:', this.user.userId);
+     // console.log('User ID:', this.user.userId);
     } else {
-      console.log('User is undefined');
+     // console.log('User is undefined');
     }
   
     this.paramsSubscription = this.route.paramMap.subscribe({
@@ -153,7 +157,7 @@ export class RehberGuncelleComponent implements OnInit, OnDestroy {
           this.rehberService.rehberGoruntuleID(this.user?.userId,this.id).subscribe({
             next: (response) => {
               this.kisiBilgi = response;
-              console.log(response);
+              //console.log(response);
             },
           });
         }}

@@ -29,7 +29,8 @@ export class NavbarComponent implements OnInit {
   userLogout(): void {
     this.userService.logout();
     this.user = undefined; // Make sure to set user to undefined
-    console.log(this.user); // Add a console log to check the user value
+   // console.log(this.user); // Add a console log to check the user value
     this.router.navigateByUrl('');
+    alert('Çıkış yapıldı');
   }
 }

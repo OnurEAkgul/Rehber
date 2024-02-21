@@ -28,7 +28,7 @@ namespace Rehber.API.Controllers
 
         [HttpPost("{userId:guid}")]
         // [Route("{userId:guid}")]
-         [Authorize(Roles = "userRole")]
+        [Authorize(Roles = "userRole")]
         public async Task<IActionResult> CreateRehber([FromBody] CreateRehberRequest request, [FromRoute] Guid userId)
         {
             // DTO dan domain modeline
@@ -57,10 +57,9 @@ namespace Rehber.API.Controllers
             return Ok(response);
         }
 
-        //GET METHODU https://localhost:7195/api/Rehber
+        //GET METHODU https://localhost:7195/api/Rehber/{userId}
         [HttpGet("{userId:guid}")]
-        //[Route("{userId:guid}")]
-        [Authorize(Roles = "userRole")]
+        //[Authorize(Roles = "userRole")]
         public async Task<IActionResult> GetRehberWhereId([FromRoute] Guid userId)
         {
             var rehber = await rehberRepository.GetRehberWhereIdAsync(userId);

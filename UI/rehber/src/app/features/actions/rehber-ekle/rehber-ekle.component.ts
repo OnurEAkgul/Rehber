@@ -28,12 +28,12 @@ export class RehberEkleComponent implements OnDestroy,OnInit {
 
   ngOnInit(): void {
     this.user = this.userService.getUserFromLocalStorage();
-    console.log('User from local storage:', this.user);
+    //console.log('User from local storage:', this.user);
   
     if (this.user) {
-      console.log('User ID:', this.user.userId);
+     // console.log('User ID:', this.user.userId);
     } else {
-      console.log('User is undefined');
+     // console.log('User is undefined');
     }
   }
 
@@ -74,7 +74,7 @@ export class RehberEkleComponent implements OnDestroy,OnInit {
     .rehberEkle(this.model,this.user.userId)
     .subscribe({
       next: (response) => {
-        this.router.navigateByUrl('islem/goruntule');
+        this.router.navigateByUrl(`islem/goruntule/${this.user?.userId}`);
       },
       // error: (error) => {
       //   if (error.status === 409) {
