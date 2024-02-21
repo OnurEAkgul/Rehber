@@ -2,7 +2,8 @@ import { Component, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { UserService } from '../user.service';
 import { Router } from '@angular/router';
-import { userSignup } from '../models/signup.model';
+import { userSignup } from '../models/signup.model'; // Update import
+import { signupRequest } from '../models/user-signup-request.model';
 
 @Component({
   selector: 'app-sign-up',
@@ -10,7 +11,7 @@ import { userSignup } from '../models/signup.model';
   styleUrls: ['./sign-up.component.css'],
 })
 export class SignUpComponent implements OnDestroy {
-  model: userSignup;
+  model: signupRequest; // Update type
   private signUpSubscription?: Subscription;
 
   constructor(private userService: UserService, private router: Router) {
@@ -18,6 +19,7 @@ export class SignUpComponent implements OnDestroy {
       userName: '',
       userPassword: '',
       userEmail: '',
+      userId:''
     };
   }
 
@@ -42,7 +44,12 @@ export class SignUpComponent implements OnDestroy {
       this.signUpSubscription = this.userService.userEkle(this.model).subscribe({
         next: (response) => {
           alert('Sign-up successful!'); // Provide a success message
-          this.router.navigateByUrl('islem/goruntule');
+
+          this.router.navigateByUrl('userislem/giris')
+          console.log(response)
+          // Now you can use the retrieved userId for navigation
+         // const userId = response.userId;
+         // this.router.navigate(['/userislem/info', userId]);
         },
         error: (error) => {
           // Handle error appropriately, e.g., show a specific error message based on the error status

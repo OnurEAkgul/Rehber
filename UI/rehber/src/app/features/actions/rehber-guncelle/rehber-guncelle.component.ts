@@ -4,6 +4,8 @@ import { Subscription } from 'rxjs';
 import { RehberService } from '../services/rehber.service';
 import { rehberGoruntule } from '../models/rehber-goruntule.model';
 import { RehberUpdate } from '../models/rehber-update.model';
+import { userInformation } from '../../userActions/models/userInfo.model';
+import { UserService } from '../../userActions/user.service';
 
 @Component({
   selector: 'app-rehber-guncelle',
@@ -14,7 +16,8 @@ export class RehberGuncelleComponent implements OnInit, OnDestroy {
   id: string | null = null;
   kisiBilgi?: rehberGoruntule;
   formSubmitted: boolean = false;
-
+  user?: userInformation;
+  
   paramsSubscription?: Subscription;
   editKisiSubscription?: Subscription;
   deleteKisiSubscription?: Subscription;
@@ -24,12 +27,14 @@ export class RehberGuncelleComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private rehberService: RehberService,
-    private router: Router
+    private router: Router,
+    private userService:UserService
   ) {}
 
   onFormSubmit(): void {
     this.formSubmitted = true;
 
+    this.user = this.userService.getUserFromLocalStorage();
     if (this.kisiBilgi) {
       if (
         !this.kisiBilgi.phone ||
@@ -63,6 +68,7 @@ export class RehberGuncelleComponent implements OnInit, OnDestroy {
       surname: this.kisiBilgi?.surname ?? '',
       email: this.kisiBilgi?.email ?? '',
       phone: this.kisiBilgi?.phone ?? '',
+      userId: '',
     };
 
     if (this.id) {
@@ -70,7 +76,10 @@ export class RehberGuncelleComponent implements OnInit, OnDestroy {
         .rehberUpdateID(this.id, rehberUpdate)
         .subscribe({
           next: (response) => {
-            this.router.navigateByUrl('islem/goruntule');
+            console.log(this.kisiBilgi?.userId);
+            console.log(this.user?.userId);
+            
+            this.router.navigateByUrl(`islem/goruntule/${this.user?.userId}`);
           },
         });
     }
@@ -88,7 +97,7 @@ export class RehberGuncelleComponent implements OnInit, OnDestroy {
           .rehberDeleteID(this.id)
           .subscribe({
             next: (Response) => {
-              this.router.navigateByUrl('islem/goruntule');
+              this.router.navigateByUrl(`islem/goruntule/${this.user?.userId}`);
             },
             complete: () => {
               // Reset deleteInProgress to false when the deletion is complete
@@ -129,17 +138,30 @@ export class RehberGuncelleComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+
+    this.user = this.userService.getUserFromLocalStorage();
+   // console.log('User from local storage:', this.user);
+  
+    if (this.user) {
+     // console.log('User ID:', this.user.userId);
+    } else {
+     // console.log('User is undefined');
+    }
+  
     this.paramsSubscription = this.route.paramMap.subscribe({
       next: (params) => {
         this.id = params.get('id');
 
+        if(this.user){
         if (this.id) {
-          this.rehberService.rehberGoruntuleID(this.id).subscribe({
+          this.rehberService.rehberGoruntuleID(this.user?.userId,this.id).subscribe({
             next: (response) => {
               this.kisiBilgi = response;
+              //console.log(response);
             },
           });
-        }
+        }}
+        else return
       },
     });
   }

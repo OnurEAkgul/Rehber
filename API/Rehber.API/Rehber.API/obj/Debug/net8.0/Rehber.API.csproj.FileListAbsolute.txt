@@ -138,3 +138,11 @@ D:\D Files\Projects\Staj Task\API\Rehber.API\Rehber.API\bin\Debug\net8.0\Microso
 D:\D Files\Projects\Staj Task\API\Rehber.API\Rehber.API\bin\Debug\net8.0\Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll
 D:\D Files\Projects\Staj Task\API\Rehber.API\Rehber.API\bin\Debug\net8.0\Newtonsoft.Json.dll
 D:\D Files\Projects\Staj Task\API\Rehber.API\Rehber.API\bin\Debug\net8.0\Newtonsoft.Json.Bson.dll
+D:\D Files\Projects\Staj Task\API\Rehber.API\Rehber.API\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+D:\D Files\Projects\Staj Task\API\Rehber.API\Rehber.API\bin\Debug\net8.0\Microsoft.AspNetCore.Cryptography.Internal.dll
+D:\D Files\Projects\Staj Task\API\Rehber.API\Rehber.API\bin\Debug\net8.0\Microsoft.AspNetCore.Cryptography.KeyDerivation.dll
+D:\D Files\Projects\Staj Task\API\Rehber.API\Rehber.API\bin\Debug\net8.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
+D:\D Files\Projects\Staj Task\API\Rehber.API\Rehber.API\bin\Debug\net8.0\Microsoft.Extensions.Identity.Core.dll
+D:\D Files\Projects\Staj Task\API\Rehber.API\Rehber.API\bin\Debug\net8.0\Microsoft.Extensions.Identity.Stores.dll
+D:\D Files\Projects\Staj Task\API\Rehber.API\Rehber.API\bin\Debug\net8.0\Microsoft.Extensions.Options.dll
+D:\D Files\Projects\Staj Task\API\Rehber.API\Rehber.API\bin\Debug\net8.0\BCrypt.Net.dll

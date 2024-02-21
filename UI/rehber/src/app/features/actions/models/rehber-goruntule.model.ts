@@ -3,5 +3,6 @@ export interface rehberGoruntule{
     name:string,
     surname:string,
     email:string,
-    phone:string
+    phone:string,
+    userId: string
 }

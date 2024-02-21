@@ -1,33 +1,72 @@
 <nav class="navbar navbar-expand-lg bg-body-tertiary">
-    <div class="container-fluid">
-      <a class="navbar-brand" [routerLink]="['']">Rehber</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item">
-            <a class="nav-link active" aria-current="page" [routerLink]="['']">Kullanıcı Adı gelecek</a>
+  <div class="container-fluid">
+    <a class="navbar-brand">Rehber</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <ng-container *ngIf="user?.userEmail; else notFound">
+            <a class="nav-link active" *ngIf="user?.role?.includes('adminRole'); else userbar"
+             >Hoşgeldiniz
+              {{user?.userEmail}}</a>
+          </ng-container>
+
+          <ng-template #userbar>
+            <a class="nav-link active"
+             aria-current="page" [routerLink]="['/userislem/info', user?.userId]  ">Hoşgeldiniz
+              {{user?.userEmail}}</a>
+          </ng-template>
+          
+        </li>
+        <li class="nav-item">
+          <ng-template #notFound>
+            <a class="nav-link active" aria-current="page"></a>
+          </ng-template>
+
+        </li>
+        <ng-container *ngIf="user && user.role">
+          <li class="nav-item" *ngIf="user.role.includes('adminRole'); else userrole">
+
+            <a class="nav-link active" aria-current="page" [routerLink]="['admin/islem']">Admin Paneli</a>
+
+
           </li>
+
+
+
+        </ng-container>
+        <ng-template #userrole>
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               İşlemler
             </a>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" [routerLink]="['/islem/kaydet']">Yeni kullanıcı kaydet</a></li>
-              <li><a class="dropdown-item" [routerLink]="['/islem/goruntule']">Kullanıcıları görüntüle</a></li>
+              <li><a class="dropdown-item" [routerLink]="['/islem/kaydet', user?.userId]">Yeni kişi kaydet</a></li>
+              <li><a class="dropdown-item" [routerLink]="['/islem/goruntule', user?.userId]">Kişilerimi görüntüle</a>
+              </li>
             </ul>
           </li>
+        </ng-template>
+
+        <ng-container *ngIf="user === undefined; else showLogout">
+
           <li class="nav-item">
             <a class="nav-link active" aria-current="page" [routerLink]="['userislem/kaydol']">Kayıt Ol</a>
           </li>
           <li class="nav-item">
             <a class="nav-link active" aria-current="page" [routerLink]="['userislem/giris']">Giriş Yap</a>
           </li>
-          
-          
-        </ul>
-        
-      </div>
+
+        </ng-container>
+        <ng-template #showLogout>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" (click)="userLogout()" [routerLink]="['']">Çıkış Yap</a>
+          </li>
+        </ng-template>
+      </ul>
     </div>
-  </nav>
+  </div>
+</nav>

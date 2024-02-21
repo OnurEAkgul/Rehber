@@ -5,12 +5,12 @@ namespace Rehber.API.Data
 {
     public class ApplicationDbContext : DbContext
     {
-        public ApplicationDbContext(DbContextOptions options) : base(options)
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
     
         }
     
-        public DbSet<rehberIcerik> rehberIcerikleri { get; set; }
-        public DbSet<userIcerik> userIcerikleri { get;set; }
+        public DbSet<rehberIcerik> rehberIcerik { get; set; }
+        public DbSet<userIcerik> userIcerik { get;set; }
     }
 }

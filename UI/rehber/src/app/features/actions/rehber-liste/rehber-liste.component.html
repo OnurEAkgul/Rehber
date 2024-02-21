@@ -1,7 +1,7 @@
 <div class="container">
-  <h1 class="mt-3">Kullanıcı listesi</h1>
+  <h1 class="mt-3">Kişilerim</h1>
   <div class="d-flex justify-content-end mt-3">
-    <a [routerLink]="['/islem/goruntule/kaydet']" class="btn btn-primary">Yeni kullanıcı ekle</a>
+    <a [routerLink]="['/islem/kaydet/',user?.userId]" class="btn btn-primary">Yeni kişi ekle</a>
   </div>
 
   <ng-container *ngIf="rehberList$ | async as rehberList">
@@ -24,7 +24,7 @@
           <td>{{ item.email }}</td>
           <td>{{ item.phone }}</td>
           <td>
-            <a class="btn btn-light" [routerLink]="['/islem/guncelle', item.id]">
+            <a class="btn btn-light" [routerLink]="['/islem/guncelle',item.userId, item.id]">
               Güncelle
             </a>
           </td>

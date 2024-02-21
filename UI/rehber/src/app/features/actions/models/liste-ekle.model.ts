@@ -3,4 +3,5 @@ export interface rehberRequest{
     surname:string,
     email:string,
     phone:string,
+    userId: string
 }

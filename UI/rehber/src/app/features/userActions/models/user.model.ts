@@ -1,8 +1,8 @@
 export interface userRequest {
 
     userId:string,
-    userName:string
+    userName:string,
     userPassword:string,
-    userEmail:string,
+    userEmail:string
 
 }
