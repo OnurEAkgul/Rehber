@@ -66,8 +66,6 @@ const routes: Routes = [
     component: RehberEkleComponent,
      canActivate: [authGuard],
   },
-  
- 
 ];
 
 @NgModule({

@@ -3,7 +3,7 @@ import { Subscription } from 'rxjs';
 import { UserService } from '../../user.service';
 import { UserUpdate } from '../../models/user-update.model';
 import { userRequest } from '../../models/user.model';
-import { Route, Router } from '@angular/router';
+import {  Router } from '@angular/router';
 import { userInformation } from '../../models/userInfo.model';
 
 @Component({

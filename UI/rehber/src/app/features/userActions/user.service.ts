@@ -16,7 +16,7 @@ import { CookieService } from 'ngx-cookie-service';
 })
 export class UserService {
   $userInfo = new BehaviorSubject<userInformation | undefined>(undefined);
-
+ 
   constructor(private http: HttpClient, private cookieService: CookieService) {}
 
   userEkle(model: signupRequest): Observable<userRequest> {
@@ -101,6 +101,8 @@ export class UserService {
       `${environment.apiBaseUrl}/api/user/DeleteUser/${userId}?addAuth=true`
     );
   }
+
+  
 
   /**/
 }

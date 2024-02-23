@@ -2,12 +2,16 @@
 
 namespace Rehber.API.Models.DTO
 {
+    // Yeni kullanıcı kaydı oluşturma isteğini temsil eden DTO (Data Transfer Object) sınıfı.
     public class signUpRequestDTO
     {
-
+        // Yeni kullanıcının adı.
         public string userName { get; set; }
-        public string userPassword { get; set; }
-        public string userEmail { get; set; }
 
+        // Yeni kullanıcının şifresi.
+        public string userPassword { get; set; }
+
+        // Yeni kullanıcının e-posta adresi.
+        public string userEmail { get; set; }
     }
 }

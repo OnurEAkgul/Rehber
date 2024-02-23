@@ -1,26 +1,59 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { userLogin } from '../models/login.model';
 import { UserService } from '../user.service';
 import { Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
+import { userInformation } from '../models/userInfo.model';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  styleUrls: ['./login.component.css'],
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
+  model: userLogin;
+  userInfo?: userInformation;
+  constructor(
+    private userService: UserService,
+    private router: Router,
+    private cookieService: CookieService
+  ) {
+    this.model = {
+      userEmail: '',
+      userPassword: '',
+    };
+  }
 
-model:userLogin;
-constructor(private userService:UserService,  private router: Router, private cookieService:CookieService){
+  ngOnInit(): void {
 
-  this.model= {
-    userEmail: '',    
-    userPassword: ''
-  };
+    const autoSignInEmail = localStorage.getItem('autoSignInEmail');
+    const autoSignInPassword = localStorage.getItem('autoSignInPassword');
+
+    if (autoSignInEmail && autoSignInPassword) {
+      this.model.userEmail=autoSignInEmail;
+      this.model.userPassword=autoSignInPassword;
 
 
-}
+      localStorage.removeItem('autoSignInEmail');
+      localStorage.removeItem('autoSignInPassword');
+    }
+
+
+    this.userInfo= this.userService.getUserFromLocalStorage();
+    console.log(this.userInfo)
+    if (this.userInfo) {
+      if (this.userInfo.role.includes('adminRole')) {
+        console.log(this.userInfo)
+        this.router.navigateByUrl('admin/islem');
+      } else {
+        console.log(this.userInfo)
+        this.router.navigateByUrl(`islem/goruntule/${this.userInfo.userId}`);
+      }
+    }
+  }
+  
+
+
 
   formSubmitted = false;
   onSignIn() {
@@ -30,28 +63,32 @@ constructor(private userService:UserService,  private router: Router, private co
       this.userService.userLogin(this.model).subscribe({
         next: (response) => {
           // Alert for successful login
-          this.cookieService.set('Authorization',`Bearer ${response.token}`,
-          undefined,'/',undefined,true,'Strict');
+          this.cookieService.set(
+            'Authorization',
+            `Bearer ${response.token}`,
+            undefined,
+            '/',
+            undefined,
+            true,
+            'Strict'
+          );
 
           //set local user
           this.userService.setUser({
             userId: response.userId,
             userEmail: response.userEmail,
             role: response.role,
-            token: response.token, 
+            token: response.token,
           });
-          if(response.role.includes('adminRole')){
-            this.router.navigate(['admin/islem']);  
+          if (response.role.includes('adminRole')) {
+            this.router.navigate(['admin/islem']);
             alert('Login successful!');
+          } else {
+            alert('Login successful!');
+            this.router.navigate(['islem/goruntule', response.userId]);
           }
-          else{
-          alert('Login successful!');
-          this.router.navigate(['islem/goruntule',response.userId]);
-        }
-         // this.router.navigate(['/userislem/info', response.userId]);
+          // this.router.navigate(['/userislem/info', response.userId]);
 
-         
-          
           // Your existing success logic here
         },
         error: (error) => {
@@ -65,7 +102,7 @@ constructor(private userService:UserService,  private router: Router, private co
             // Alert for other errors
             alert('Sign in failed. Please try again.');
           }
-        }
+        },
       });
     }
   }

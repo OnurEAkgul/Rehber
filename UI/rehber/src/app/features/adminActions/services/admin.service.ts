@@ -84,5 +84,11 @@ export class adminService {
     );
   }
 
+  deleteUserID(userId: string): Observable<userRequest> {
+    return this.http.delete<userRequest>(
+      `${environment.apiBaseUrl}/api/user/DeleteUser/${userId}?addAuth=true`
+    );
+  }
+
 
 }

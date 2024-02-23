@@ -1,5 +1,4 @@
-﻿
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,20 +7,22 @@ using Rehber.API.Models.Domain;
 using Rehber.API.Models.DTO;
 using Rehber.API.Repositories.Implementation;
 using Rehber.API.Repositories.Interface;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Rehber.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class userController : ControllerBase
+    public class UserController : ControllerBase
     {
-
         private readonly InterfaceUserRepository userRepository;
         private readonly UserManager<IdentityUser> userManager;
         private readonly ApplicationDbContext dbContext;
         private readonly InterfaceTokenRepository tokenRepository;
 
-        public userController(UserManager<IdentityUser> userManager, ApplicationDbContext dbContext, InterfaceTokenRepository tokenRepository, InterfaceUserRepository userRepository)
+        public UserController(UserManager<IdentityUser> userManager, ApplicationDbContext dbContext, InterfaceTokenRepository tokenRepository, InterfaceUserRepository userRepository)
         {
             this.userManager = userManager;
             this.dbContext = dbContext;
@@ -29,15 +30,21 @@ namespace Rehber.API.Controllers
             this.userRepository = userRepository;
         }
 
-
-        //POST METODU LOGIN     https://localhost:7195/api/user/Login
-
+        // POST METODU LOGIN https://localhost:7195/api/user/Login
         [HttpPost]
         [Route("Login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDTO request)
         {
+            // İstek geçerli değilse BadRequest döndür
+            if (request == null)
+            {
+                return BadRequest("Geçersiz istek");
+            }
+
+            // Kullanıcının e-posta adresine göre IdentityUser'ı bul
             var identityUser = await userManager.FindByEmailAsync(request.userEmail);
 
+            // Kullanıcı bulunamazsa NotFound döndür
             if (identityUser == null)
             {
                 return NotFound();
@@ -45,16 +52,18 @@ namespace Rehber.API.Controllers
 
             if (identityUser is not null)
             {
-
-
+                // Şifreyi kontrol et
                 var checkPasswordResult = await userManager.CheckPasswordAsync(identityUser, request.userPassword);
 
                 if (checkPasswordResult)
                 {
-
+                    // Rol bilgilerini al
                     var role = await userManager.GetRolesAsync(identityUser);
-                    //Create a token if successful               
+
+                    // Jwt token oluştur
                     var jwttoken = tokenRepository.CreateJwtToken(identityUser, role.ToList());
+
+                    // Yanıt oluştur
                     var response = new LoginResponseDTO()
                     {
                         userEmail = request.userEmail,
@@ -66,52 +75,64 @@ namespace Rehber.API.Controllers
                     return Ok(response);
                 }
             }
-            ModelState.AddModelError("", "hatalı şifre girdiniz");
+
+            ModelState.AddModelError("", "Hatalı şifre girdiniz");
             return ValidationProblem(ModelState);
         }
 
-
-        //POST METODU SIGN UP   https://localhost:7195/api/user/CreateUser
+        // POST METODU SIGN UP https://localhost:7195/api/user/CreateUser
         [HttpPost]
         [Route("CreateUser")]
         public async Task<IActionResult> CreateUser([FromBody] signUpRequestDTO request)
         {
+            // İstek geçerli değilse BadRequest döndür
+            if (request == null)
+            {
+                return BadRequest("Geçersiz istek");
+            }
+
+            // Yeni bir IdentityUser oluştur
             var identityUser = new IdentityUser
             {
                 UserName = request.userName?.Trim(),
                 Email = request.userEmail?.Trim()
             };
 
-            var existingUser = await userManager.FindByEmailAsync(request.userEmail);
-            if (existingUser != null)
+            // E-posta ve şifre kontrolü
+            if (string.IsNullOrEmpty(request.userEmail) || string.IsNullOrEmpty(request.userPassword))
             {
-                // Handle duplicate email
-                ModelState.AddModelError("hata", "Email is already in use");
+                ModelState.AddModelError("hata", "E-posta ve şifre gerekli");
                 return ValidationProblem(ModelState);
             }
 
+            // E-posta adresi zaten kullanılmış mı kontrol et
+            var existingUser = await userManager.FindByEmailAsync(request.userEmail);
+            if (existingUser != null)
+            {
+                ModelState.AddModelError("hata", "E-posta zaten kullanılıyor");
+                return ValidationProblem(ModelState);
+            }
 
-
+            // IdentityUser oluştur
             var identityResult = await userManager.CreateAsync(identityUser, request.userPassword);
 
-
-
-
-
-
+            // Başarılı ise
             if (identityResult.Succeeded)
             {
+                // Kullanıcıya userRole rolü ver
                 await userManager.AddToRoleAsync(identityUser, "userRole");
 
+                // userIcerik oluştur
                 var userIcerik = new userIcerik
                 {
                     userId = Guid.Parse(identityUser.Id),
                     userName = request.userName?.Trim(),
                     userEmail = request.userEmail?.Trim(),
-                    userPassword = request.userPassword?.Trim(), // Include the password
+                    userPassword = request.userPassword?.Trim(), // Şifreyi içerir
                     AspNetUserId = identityUser.Id
                 };
 
+                // Veritabanına ekle ve kaydet
                 dbContext.userIcerik.Add(userIcerik);
                 await dbContext.SaveChangesAsync();
 
@@ -119,6 +140,7 @@ namespace Rehber.API.Controllers
             }
             else
             {
+                // Hata durumunda
                 foreach (var error in identityResult.Errors)
                 {
                     ModelState.AddModelError("hata", error.Description);
@@ -128,148 +150,92 @@ namespace Rehber.API.Controllers
             }
         }
 
-
         // PUT METODU UPDATE https://localhost:7195/api/user/UpdateUser/{userId}
         [HttpPut]
         [Authorize(Roles = "adminRole, userRole")]
         [Route("UpdateUser/{userId:guid}")]
         public async Task<IActionResult> UpdateUser([FromRoute] Guid userId, UpdateUserRequestDTO request)
         {
+            // İstek geçerli değilse BadRequest döndür
+            if (request == null)
+            {
+                return BadRequest("Geçersiz istek");
+            }
+
             using (var transaction = await dbContext.Database.BeginTransactionAsync())
             {
                 try
                 {
-                    // Update IdentityUser
+                    // IdentityUser'ı bul
                     var identityUser = await userManager.FindByIdAsync(userId.ToString());
                     if (identityUser == null)
                     {
-                        return NotFound("User not found");
+                        return NotFound("Kullanıcı bulunamadı");
                     }
 
-                    // Check if the user has the "adminRole"
+                    // Admin mi kontrolü
                     bool isAdmin = await userManager.IsInRoleAsync(identityUser, "adminRole");
 
-                    // Allow passwordless update for users with "adminRole"
+                    // Admin değilse veya (admin ise ve yeni şifre yoksa) şifre kontrolü yap
                     if (!isAdmin || (isAdmin && string.IsNullOrEmpty(request.newPassword)))
                     {
-                        // Check if the current password matches
                         if (!await userManager.CheckPasswordAsync(identityUser, request.currentPassword))
                         {
-                            // Current password is incorrect
-                            return BadRequest("Current password is incorrect");
+                            return BadRequest("Geçerli şifre yanlış");
                         }
                     }
 
-                    // Continue with the rest of your existing logic...
+                    // Kullanıcı bilgilerini güncelle
                     identityUser.UserName = request.userName?.Trim();
                     identityUser.Email = request.userEmail?.Trim();
 
-                    // Check if the user wants to change the password
+                    // Yeni şifre varsa hash'le
                     if (!string.IsNullOrEmpty(request.newPassword))
                     {
-                        // If newPassword is provided, update the password in IdentityUser
                         var newPasswordHash = userManager.PasswordHasher.HashPassword(identityUser, request.newPassword);
                         identityUser.PasswordHash = newPasswordHash;
                     }
 
+                    // IdentityUser güncelle
                     var identityResult = await userManager.UpdateAsync(identityUser);
                     if (!identityResult.Succeeded)
                     {
-                        // Handle update failure
-                        throw new Exception("Failed to update IdentityUser");
+                        throw new Exception("IdentityUser güncellenirken hata oluştu");
                     }
 
-                    // Update userIcerik
+                    // userIcerik'i bul
                     var userIcerik = await dbContext.userIcerik.FirstOrDefaultAsync(u => u.userId == userId);
                     if (userIcerik == null)
                     {
-                        return NotFound("UserIcerik not found");
+                        return NotFound("userIcerik bulunamadı");
                     }
 
+                    // Kullanıcı bilgilerini güncelle
                     userIcerik.userName = request.userName?.Trim();
                     userIcerik.userEmail = request.userEmail?.Trim();
 
-                    // Check if the user wants to change the password
+                    // Yeni şifre varsa güncelle
                     if (!string.IsNullOrEmpty(request.newPassword))
                     {
-                        // If newPassword is provided, update the password in userIcerik
                         userIcerik.userPassword = request.newPassword;
                     }
 
-                    // Update other properties as needed
+                    // Veritabanına kaydet
                     await dbContext.SaveChangesAsync();
 
-                    // Commit the transaction
+                    // İşlemi başarılı bir şekilde tamamla
                     await transaction.CommitAsync();
 
                     return Ok(request);
                 }
                 catch (Exception)
                 {
-                    // An error occurred, rollback the transaction
+                    // Hata olursa işlemi geri al
                     await transaction.RollbackAsync();
                     throw;
                 }
             }
         }
-
-
-        /*
-        //PUT METODU UPDATE     https://localhost:7195/api/user/UpdateUser/{userId}
-        [HttpPut]
-        // [Authorize(Roles = "userRole")]
-        [Route("UpdateUser/{userId:guid}")]
-        public async Task<IActionResult> UpdateUser([FromRoute] Guid userId, UpdateUserRequestDTO request)
-        {
-            using (var transaction = await dbContext.Database.BeginTransactionAsync())
-            {
-                try
-                {
-                    // Update IdentityUser
-                    var identityUser = await userManager.FindByIdAsync(userId.ToString());
-                    if (identityUser == null)
-                    {
-                        return NotFound("User not found");
-                    }
-
-                    identityUser.UserName = request.userName?.Trim();
-                    identityUser.Email = request.userEmail?.Trim();
-
-
-                    var identityResult = await userManager.UpdateAsync(identityUser);
-                    if (!identityResult.Succeeded)
-                    {
-                        // Handle update failure
-                        throw new Exception("Failed to update IdentityUser");
-                    }
-
-                    // Update userIcerik
-                    var userIcerik = await dbContext.userIcerik.FirstOrDefaultAsync(u => u.userId == userId);
-                    if (userIcerik == null)
-                    {
-                        return NotFound("UserIcerik not found");
-                    }
-
-                    userIcerik.userName = request.userName?.Trim();
-                    userIcerik.userEmail = request.userEmail?.Trim();
-                    // Update other properties as needed
-
-                    await dbContext.SaveChangesAsync();
-
-                    // Commit the transaction
-                    await transaction.CommitAsync();
-
-                    return Ok(request);
-                }
-                catch (Exception)
-                {
-                    // An error occurred, rollback the transaction
-                    await transaction.RollbackAsync();
-                    throw;
-                }
-            }
-        }
-        */
 
         //GET METODU USERID ILE https://localhost:7195/api/user/{userId}
         [HttpGet]
@@ -277,20 +243,23 @@ namespace Rehber.API.Controllers
         [Route("{userId:guid}")]
         public async Task<IActionResult> GetUserByUserId([FromRoute] Guid userId)
         {
+            // IdentityUser'ı bul
             var existingUser = await userManager.FindByIdAsync(userId.ToString());
 
+            // Kullanıcı bulunamazsa NotFound döndür
             if (existingUser == null)
             {
                 return NotFound();
             }
 
-            // Retrieve userIcerik
+            // userIcerik'i bul
             var userIcerik = await dbContext.userIcerik.FirstOrDefaultAsync(u => u.userId == userId);
             if (userIcerik == null)
             {
-                return NotFound("UserIcerik not found");
+                return NotFound("userIcerik bulunamadı");
             }
 
+            // Yanıt oluştur
             var response = new UserDTO
             {
                 userId = Guid.Parse(existingUser.Id),
@@ -302,17 +271,22 @@ namespace Rehber.API.Controllers
             return Ok(response);
         }
 
+        // Tüm kullanıcıları getir
         [HttpGet("all")]
         [Authorize(Roles = "adminRole")]
         public async Task<IActionResult> getAllUsers()
         {
+            // UserManager ve UserRepository'den kullanıcıları getir
             var userManagerUsers = await userManager.Users.ToListAsync();
             var userRepoUsers = await userRepository.GetUserAsync();
 
+            // Kullanıcılar bulunamazsa NotFound döndür
             if (userManagerUsers == null || userRepoUsers == null)
             {
                 return NotFound();
             }
+
+            // Yanıt oluştur
             var response = new List<UserDTO>();
             foreach (var item in userRepoUsers)
             {
@@ -322,11 +296,9 @@ namespace Rehber.API.Controllers
                     userName = item.userName,
                     userEmail = item.userEmail,
                     userPassword = item.userPassword,
-
                 });
-
-
             }
+
             return Ok(response);
         }
 
@@ -340,38 +312,38 @@ namespace Rehber.API.Controllers
             {
                 try
                 {
-                    // Find the IdentityUser
+                    // IdentityUser'ı bul
                     var identityUser = await userManager.FindByIdAsync(userId.ToString());
                     if (identityUser == null)
                     {
-                        return NotFound("User not found");
+                        return NotFound("Kullanıcı bulunamadı");
                     }
 
-                    // Check if the current user has the permission to delete
+                    // Kullanıcının silme izni var mı kontrol et
                     var userIcerik = await dbContext.userIcerik.FirstOrDefaultAsync(u => u.userId == userId);
 
-                    // Skip ownership check for administrators
+                    // Yönetici ise sahiplik kontrolünü atla
                     if (userIcerik.AspNetUserId != identityUser.Id)
                     {
-                        return Forbid(); // User is not allowed to delete other users
+                        return Forbid(); // Kullanıcı başka kullanıcıları silemez
                     }
 
-                    // Delete IdentityUser (cascade delete will handle related entities)
+                    // IdentityUser'ı sil (ilişkili varlıklar cascade delete ile silinecek)
                     var identityResult = await userManager.DeleteAsync(identityUser);
                     if (!identityResult.Succeeded)
                     {
-                        // Handle delete failure
-                        throw new Exception("Failed to delete IdentityUser");
+                        // Silme başarısız olursa
+                        throw new Exception("IdentityUser silinemedi");
                     }
 
-                    // Commit the transaction
+                    // İşlemi tamamla
                     await transaction.CommitAsync();
 
-                    return Ok(new { Message = "User deleted successfully" });
+                    return Ok(new { Message = "Kullanıcı başarıyla silindi" });
                 }
                 catch (Exception)
                 {
-                    // An error occurred, rollback the transaction
+                    // Hata olursa işlemi geri al
                     await transaction.RollbackAsync();
                     throw;
                 }
@@ -379,4 +351,3 @@ namespace Rehber.API.Controllers
         }
     }
 }
-

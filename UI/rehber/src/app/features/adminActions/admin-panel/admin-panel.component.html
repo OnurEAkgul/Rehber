@@ -1,8 +1,141 @@
-<div class="container">
-  <h1 class="mt-3">Rehber listesi</h1>
-  <div class="d-flex justify-content-end mt-3">
-    <ng-container>
-      <table class="table table-bordered mt-3">
+<div class="container-fluid">
+
+  <ng-container *ngIf="!showRehberDetails && !showUserDetails;">
+    <div class="container mt-3">
+      <h1>Rehber Listesi</h1>
+
+      <div class="justify-content-center">
+        <input type="text" pInputText [(ngModel)]="searchRehberTerm" (input)="onRehberSearch()" />
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-bordered mt-3">
+
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Adı</th>
+              <th>Soyadı</th>
+              <th>Eposta</th>
+              <th>Telefon</th>
+              <th>userId</th>
+              <th>Güncelle</th>
+              <th>Sil</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let item of rehberList$ | async">
+
+              <td (click)="onRehberClick(item)">{{item.id}}</td>
+
+              <td (click)="onRehberClick(item)">{{ item.name.length > 20 ? (item.name | slice: 0:20) + '...' : item.name
+                }}</td>
+
+              <td (click)="onRehberClick(item)">{{ item.surname.length > 20 ? (item.surname | slice: 0:20) + '...' :
+                item.surname }}</td>
+
+              <td (click)="onRehberClick(item)">{{ item.email.length > 25 ? (item.email | slice: 0:25) +
+                (item.email.length > 28 ? '...' + item.email.slice(-10) : '') : item.email }}</td>
+
+              <td (click)="onRehberClick(item)">{{ item.phone.length > 20 ? (item.phone | slice: 0:20) + '...' :
+                item.phone }}</td>
+
+              <td (click)="onRehberClick(item)">{{ item.userId.length > 20 ? (item.userId | slice: 0:20) + '...' :
+                item.userId }}</td>
+
+              <td>
+                <a class="btn btn-light" [routerLink]="['guncelle/rehber/', item.id]">
+                  Güncelle
+                </a>
+              </td>
+
+              <td>
+                <button type="button" class="btn btn-danger" (click)="onRehberDelete(item.id)"
+                  [disabled]="deleteInProgress">
+
+                  <span *ngIf="deleteInProgress" class="spinner-border spinner-border-sm me-2" role="status"
+                    aria-hidden="true"></span>
+                  Sil
+                </button>
+
+              </td>
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+    <div class="container mt-3">
+      <h1>Kullanıcı Listesi</h1>
+
+      <div class="justify-content-center">
+        <input type="text" pInputText [(ngModel)]="searchUserTerm" (input)="onUserSearch()" />
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-bordered mt-3">
+
+          <thead>
+            <tr>
+              <th>User Id</th>
+              <th>Kullanıcı Adı</th>
+              <th>Eposta adresi</th>
+              <th>Şifresi</th>
+              <th>Güncelle</th>
+              <th>Sil</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            <tr *ngFor="let user of userRequests$ | async">
+
+              <td (click)="onUserClick(user)">{{ user?.userId?.length ? (user?.userId | slice: 0:25)  :
+                user?.userId}}</td>
+
+              <td (click)="onUserClick(user)">{{ user?.userName?.length ? (user?.userName | slice: 0:25)  :
+                user?.userName}}</td>
+
+              <td (click)="onUserClick(user)">{{ user.userEmail.length > 25 ? (user.userEmail | slice: 0:25) +
+                (user.userEmail.length > 28 ? '...' + user.userEmail.slice(-10) : '') : user.userEmail }}</td>
+
+              <td (click)="onUserClick(user)">{{ user?.userPassword?.length ? (user?.userPassword | slice: 0:25) 
+                : user?.userPassword}}</td>
+
+              <td>
+                <a class="btn btn-light" [routerLink]="['guncelle/user/', user.userId]">
+                  Güncelle
+                </a>
+              </td>
+
+              <td>
+                <button type="button" class="btn btn-danger" (click)="onUserDelete(user.userId)"
+                  [disabled]="deleteInProgress">
+                  <span *ngIf="deleteInProgress" class="spinner-border spinner-border-sm me-2" role="status"
+                    aria-hidden="true"></span>
+                  Sil
+                </button>
+              </td>
+
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="showRehberDetails">
+    <!-- Details view -->
+    <div class="table-responsive mt-3">
+
+      <table class="table table-bordered">
+
         <thead>
           <tr>
             <th>Id</th>
@@ -11,58 +144,83 @@
             <th>Eposta</th>
             <th>Telefon</th>
             <th>userId</th>
-            <th>İşlem</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-          <tr *ngFor="let item of rehberList$ | async">
-            <td>{{item.id}}</td>
-            <td>{{ item.name }}</td>
-            <td>{{ item.surname }}</td>
-            <td>{{ item.email }}</td>
-            <td>{{ item.phone }}</td>
-            <td>{{ item.userId }}</td>
-            <td>
-              <a class="btn btn-light" [routerLink]="['guncelle/rehber/', item.id]">
-                Güncelle
-              </a>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </ng-container>
-  </div>
-</div>
 
-<div class="container">
-  <h1 class="mt-3">Kullanıcı listesi</h1>
-  <div class="d-flex justify-content-end mt-3">
-    <ng-container>
-      <table class="table table-bordered mt-3">
+        <tbody>
+
+          <tr>
+            <td>{{ selectedPerson?.id?.length ? (selectedPerson?.id | slice: 0:25)  : selectedPerson?.id}}</td>
+
+            <td>{{ selectedPerson?.name?.length ? (selectedPerson?.name | slice: 0:25)  : selectedPerson?.name}}
+            </td>
+
+            <td>{{ selectedPerson?.surname?.length ? (selectedPerson?.surname | slice: 0:25)  :
+              selectedPerson?.surname}}</td>
+
+            <td *ngIf="selectedPerson">{{ selectedPerson.email
+              ? selectedPerson.email.length > 25
+              ? (selectedPerson.email | slice: 0:20) +
+              (selectedPerson.email.length > 28 ? '...' + selectedPerson.email.slice(-10) : '')
+              : selectedPerson.email
+              : 'N/A' }}
+            </td>
+
+            <td>{{ selectedPerson?.phone?.length ? (selectedPerson?.phone | slice: 0:25)  :
+              selectedPerson?.phone}}</td>
+
+            <td>{{ selectedPerson?.userId?.length ? (selectedPerson?.userId | slice: 0:25)  :
+              selectedPerson?.userId}}</td>
+          </tr>
+
+        </tbody>
+
+      </table>
+      <button class="btn btn-primary" (click)="goBackToRehberList()">Go Back</button>
+    </div>
+
+  </ng-container>
+
+  <ng-container *ngIf="showUserDetails" >
+
+    <!-- Details view -->
+    <div class="table-responsive mt-3">
+      <table class="table table-bordered">
+
         <thead>
           <tr>
             <th>User Id</th>
             <th>Kullanıcı Adı</th>
             <th>Eposta adresi</th>
             <th>Şifresi</th>
-            <th>İşlem</th>
           </tr>
         </thead>
+
         <tbody>
-          <tr *ngFor="let user of userRequests$ | async">
-            <td>{{ user.userId }}</td>
-            <td>{{ user.userName }}</td>
-            <td>{{ user.userEmail }}</td>
-            <td>{{ user.userPassword }}</td>
-            <td>
-              <a class="btn btn-light" [routerLink]="['guncelle/user/', user.userId]">
-                Güncelle
-              </a>
+          <tr>
+            <td>{{ selectedUser?.userId?.length ? (selectedUser?.userId | slice: 0:25)  : selectedUser?.userId}}
             </td>
+
+            <td>{{ selectedUser?.userName?.length ? (selectedUser?.userName | slice: 0:25)  :
+              selectedUser?.userName}}</td>
+
+            <td *ngIf="selectedUser">{{ selectedUser.userEmail
+              ? selectedUser.userEmail.length > 25
+              ? (selectedUser.userEmail | slice: 0:20) +
+              (selectedUser.userEmail.length > 28 ? '...' + selectedUser.userEmail.slice(-10) : '')
+              : selectedUser.userEmail
+              : 'N/A' }}
+            </td>
+
+            <td>{{ selectedUser?.userPassword?.length ? (selectedUser?.userPassword | slice: 0:25)  :
+              selectedUser?.userPassword}}</td>
+
           </tr>
+
         </tbody>
+
       </table>
-    </ng-container>
-  </div>
+      <button class="btn btn-primary" (click)="goBackToUserList()">Go Back</button>
+    </div>
+  </ng-container>
 </div>

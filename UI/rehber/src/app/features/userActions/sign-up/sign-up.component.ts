@@ -1,17 +1,19 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { UserService } from '../user.service';
 import { Router } from '@angular/router';
 import { userSignup } from '../models/signup.model'; // Update import
 import { signupRequest } from '../models/user-signup-request.model';
+import { userInformation } from '../models/userInfo.model';
 
 @Component({
   selector: 'app-sign-up',
   templateUrl: './sign-up.component.html',
   styleUrls: ['./sign-up.component.css'],
 })
-export class SignUpComponent implements OnDestroy {
+export class SignUpComponent implements  OnInit,OnDestroy {
   model: signupRequest; // Update type
+  userInfo?:userInformation;
   private signUpSubscription?: Subscription;
 
   constructor(private userService: UserService, private router: Router) {
@@ -21,6 +23,20 @@ export class SignUpComponent implements OnDestroy {
       userEmail: '',
       userId:''
     };
+  }
+
+  ngOnInit(): void {
+    this.userInfo= this.userService.getUserFromLocalStorage();
+    console.log(this.userInfo)
+    if (this.userInfo) {
+      if (this.userInfo.role.includes('adminRole')) {
+        console.log(this.userInfo)
+        this.router.navigateByUrl('admin/islem');
+      } else {
+        console.log(this.userInfo)
+        this.router.navigateByUrl(`islem/goruntule/${this.userInfo.userId}`);
+      }
+    }
   }
 
   ngOnDestroy(): void {
@@ -45,8 +61,12 @@ export class SignUpComponent implements OnDestroy {
         next: (response) => {
           alert('Sign-up successful!'); // Provide a success message
 
+          localStorage.setItem('autoSignInEmail',this.model.userEmail);
+          localStorage.setItem('autoSignInPassword',this.model.userPassword);
+
           this.router.navigateByUrl('userislem/giris')
           console.log(response)
+
           // Now you can use the retrieved userId for navigation
          // const userId = response.userId;
          // this.router.navigate(['/userislem/info', userId]);

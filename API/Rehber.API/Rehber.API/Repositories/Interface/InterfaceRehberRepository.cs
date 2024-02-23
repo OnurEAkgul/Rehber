@@ -5,17 +5,23 @@ namespace Rehber.API.Repositories.Interface
 {
     public interface InterfaceRehberRepository
     {
+
+        //REHBER KAYDI OLUŞTURMA
         Task<rehberIcerik> CreateAsync(rehberIcerik rehber);
 
+        //TÜM REHBER İÇERİĞİNİ GETİRME
         Task<IEnumerable<rehberIcerik>> GetRehberAsync();
         
-        // BURASI DAHA SONRA KULLANICININ VERİSİ ALINARAK REHBER GÖSTERMEK İÇİN KULLANILACAK
+        //USERID İLE REHBER BİLGİSİ GETİRME
         Task<IEnumerable<rehberIcerik>> GetRehberWhereIdAsync(Guid userId);
         
+        //ID İLE REHBER BİLGİSİ GETİRME
         Task<rehberIcerik?> GetRehberById(Guid id);
 
+        //REHBER İÇERİĞİ GÜNCELLEME
         Task<rehberIcerik?> UpdateAsync(rehberIcerik rehber);
 
+        //İD YE GÖRE REHBERİ SİLME
         Task<rehberIcerik?>  DeleteAsync(Guid id);
     }
 }
