@@ -19,6 +19,7 @@ export class LoginComponent implements OnInit {
     private cookieService: CookieService
   ) {
     this.model = {
+      userName:'',
       userEmail: '',
       userPassword: '',
     };
@@ -76,7 +77,8 @@ export class LoginComponent implements OnInit {
           //set local user
           this.userService.setUser({
             userId: response.userId,
-            userEmail: response.userEmail,
+            userEmail:response.userEmail,
+            userName: response.userName,
             role: response.role,
             token: response.token,
           });
@@ -85,7 +87,8 @@ export class LoginComponent implements OnInit {
             alert('Login successful!');
           } else {
             alert('Login successful!');
-            this.router.navigate(['islem/goruntule', response.userId]);
+            console.log('info'+response.userId);
+            this.router.navigate(['islem/goruntule/', response.userId]);
           }
           // this.router.navigate(['/userislem/info', response.userId]);
 

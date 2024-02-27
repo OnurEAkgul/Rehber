@@ -1,3 +1,4 @@
+
 <nav class="navbar navbar-expand-lg bg-body-tertiary">
   <div class="container-fluid">
     <a class="navbar-brand">Rehber</a>
@@ -8,16 +9,16 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <ng-container *ngIf="user?.userEmail; else notFound">
+          <ng-container *ngIf="user?.userName; else notFound">
             <a class="nav-link active" *ngIf="user?.role?.includes('adminRole'); else userbar"
              >Hoşgeldiniz
-              {{user?.userEmail}}</a>
+              {{user?.userName}}</a>
           </ng-container>
 
           <ng-template #userbar>
             <a class="nav-link active"
              aria-current="page" [routerLink]="['/userislem/info', user?.userId]  ">Hoşgeldiniz
-              {{user?.userEmail}}</a>
+              {{user?.userName}}</a>
           </ng-template>
           
         </li>
@@ -29,10 +30,7 @@
         </li>
         <ng-container *ngIf="user && user.role">
           <li class="nav-item" *ngIf="user.role.includes('adminRole'); else userrole">
-
             <a class="nav-link active" aria-current="page" [routerLink]="['admin/islem']">Admin Paneli</a>
-
-
           </li>
 
 

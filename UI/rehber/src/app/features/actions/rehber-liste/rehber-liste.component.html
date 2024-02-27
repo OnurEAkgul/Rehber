@@ -9,16 +9,18 @@
 
   <ng-container *ngIf="!showDetails; else detailsView">
 
-    <div class="justify-content-center">
-      <input type="text" pInputText [(ngModel)]="searchTerm" (input)="onSearch()" />
+    <div class="d-flex align-items-center">
+      <input type="text" [(ngModel)]="searchTerm" (input)="onSearch()" />
+      <button type="button" class="btn btn-primary btn-sm m-1" (click)="clearFilters()">Clear Filters</button>
     </div>
+    
 
     <!-- Table view -->
     <div class="table-responsive mt-3">
 
       <table class="table table-bordered">
 
-        <thead>
+        <thead class="text-center">
           <tr>
             <th>Name</th>
             <th>Surname</th>
@@ -29,7 +31,7 @@
           </tr>
         </thead>
 
-        <tbody>
+        <tbody class=" text-center" >
           <tr *ngFor="let item of rehberList$ | async">
 
             <td (click)="onRowClick(item)">{{ item.name.length > 25 ? (item.name | slice: 0:25) + '...' : item.name }}
@@ -44,18 +46,17 @@
             <td (click)="onRowClick(item)">{{ item.phone.length > 25 ? (item.phone | slice: 0:25) + '...' : item.phone
               }}</td>
 
-            <td class="d-flex justify-content-center">
+            <td>
               <a class="btn btn-light" [routerLink]="['/islem/guncelle', item.userId, item.id]">Güncelle</a>
             </td>
 
             <td>
 
-              <button type="button" class="btn btn-danger ms-3" (click)="onDelete(item.id)"
+              <button type="button" class="btn btn-danger just" (click)="onDelete(item.id)"
                 [disabled]="deleteInProgress">
 
                 <span *ngIf="deleteInProgress" class="spinner-border spinner-border-sm me-2" role="status"aria-hidden="true"></span>
                   Kullanıcıyı sil
-              
                 </button>
 
             </td>
@@ -72,7 +73,7 @@
   <ng-template #detailsView>
     <!-- Details view -->
     
-    <div class="table-responsive mt-3">
+    <div class="table-responsive mt-3 text-center">
       
       <table class="table table-bordered">
         
@@ -114,3 +115,4 @@
     </div>
   </ng-template>
 </div>
+

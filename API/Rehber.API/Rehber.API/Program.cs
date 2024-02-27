@@ -76,11 +76,13 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+//CORS AYARLARI
 app.UseCors(Options =>
 {
     Options.AllowAnyHeader();
     Options.AllowAnyOrigin();
     Options.AllowAnyMethod();
+    
 });
 
 app.UseAuthentication();

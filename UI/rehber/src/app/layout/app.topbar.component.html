@@ -1,0 +1,40 @@
+<div class="layout-topbar">
+    
+    <ng-container *ngIf="user?.role?.includes('adminRole'); else userbar">
+        <a class="layout-topbar-logo" routerLink="">
+        <img src="assets/layout/images/{{layoutService.config().colorScheme === 'light' ? 'logo-dark' : 'logo-white'}}.svg" alt="logo">
+        <span>Hoşgeldiniz
+            {{user?.userName}}</span>
+    </a>
+      </ng-container>
+
+      <ng-template #userbar>
+        <a class="layout-topbar-logo" routerLink="">
+            <img src="assets/layout/images/{{layoutService.config().colorScheme === 'light' ? 'logo-dark' : 'logo-white'}}.svg" alt="logo">
+            <span [routerLink]="['/userislem/info', user?.userId]"  >Hoşgeldiniz
+                {{user?.userName}}</span>
+        </a>
+        
+      </ng-template>
+
+    <button #menubutton class="p-link layout-menu-button layout-topbar-button" (click)="layoutService.onMenuToggle()">
+        <i class="pi pi-bars"></i>
+    </button>
+
+    <button #topbarmenubutton class="p-link layout-topbar-menu-button layout-topbar-button" (click)="layoutService.showProfileSidebar()">
+        <i class="pi pi-ellipsis-v"></i>
+    </button>
+
+    <div #topbarmenu class="layout-topbar-menu" [ngClass]="{'layout-topbar-menu-mobile-active': layoutService.state.profileSidebarVisible}">
+        
+        <button class="p-link layout-topbar-button" [routerLink]="['/userislem/info', user?.userId]">
+            <i class="pi pi-user"></i>
+            <span>Profil</span>
+            <a ></a>
+        </button>
+        <button class="p-link layout-topbar-button" (click)="userLogout()" >
+            <i class="pi pi-sign-out"></i>
+            <span>Çıkış</span>
+        </button>
+    </div>
+</div>

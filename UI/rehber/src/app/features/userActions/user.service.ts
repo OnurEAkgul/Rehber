@@ -30,6 +30,7 @@ export class UserService {
     return this.http.post<loginResponse>(
       `${environment.apiBaseUrl}/api/user/Login`,
       {
+        
         userEmail: model.userEmail,
         userPassword: model.userPassword,
       }
@@ -39,7 +40,8 @@ export class UserService {
   setUser(user: userInformation): void {
     this.$userInfo.next(user);
 
-    localStorage.setItem('userEmail', user.userEmail);
+    localStorage.setItem('userEmail',user.userEmail);
+    localStorage.setItem('userName', user.userName);
     localStorage.setItem('userId', user.userId);
     localStorage.setItem('token', user.token);
     localStorage.setItem('role', user.role.join(','));
@@ -47,13 +49,14 @@ export class UserService {
 
   getUserFromLocalStorage(): userInformation | undefined {
     const userEmail = localStorage.getItem('userEmail');
+    const userName = localStorage.getItem('userName');
     const userId = localStorage.getItem('userId');
     const token = localStorage.getItem('token');
     const roleString = localStorage.getItem('role');
 
-    if (userEmail && userId && token && roleString) {
+    if (userEmail&&userName && userId && token && roleString) {
       const roles = roleString.split(','); // Convert comma-separated string to array
-      return { userId, userEmail, token, role: roles };
+      return { userEmail,userId, userName, token, role: roles };
     }
 
     // If any of the required information is missing, return 'undefined'

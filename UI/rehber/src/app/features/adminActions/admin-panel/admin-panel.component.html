@@ -4,11 +4,12 @@
     <div class="container mt-3">
       <h1>Rehber Listesi</h1>
 
-      <div class="justify-content-center">
-        <input type="text" pInputText [(ngModel)]="searchRehberTerm" (input)="onRehberSearch()" />
+      <div class="d-flex align-items-center">
+        <input type="text" [(ngModel)]="searchRehberTerm" (input)="onRehberSearch()" />
+        <button type="button" class="btn btn-primary btn-sm m-1" (click)="clearRehberFilters()">Clear Filters</button>
       </div>
 
-      <div class="table-responsive">
+      <div class="table-responsive text-center">
         <table class="table table-bordered mt-3">
 
           <thead>
@@ -70,14 +71,15 @@
 
     </div>
 
-    <div class="container mt-3">
+    <div class="container mt-3 ">
       <h1>Kullanıcı Listesi</h1>
 
-      <div class="justify-content-center">
-        <input type="text" pInputText [(ngModel)]="searchUserTerm" (input)="onUserSearch()" />
+      <div class="d-flex align-items-center">
+        <input type="text" [(ngModel)]="searchUserTerm" (input)="onUserSearch()" />
+        <button type="button" class="btn btn-primary btn-sm m-1" (click)="clearUserFilters()">Clear Filters</button>
       </div>
 
-      <div class="table-responsive">
+      <div class="table-responsive text-center">
         <table class="table table-bordered mt-3">
 
           <thead>
@@ -132,7 +134,9 @@
 
   <ng-container *ngIf="showRehberDetails">
     <!-- Details view -->
-    <div class="table-responsive mt-3">
+    <div class="container mt-3">
+      <h1>Rehber Listesi</h1>
+    <div class="table-responsive mt-3 text-center">
 
       <table class="table table-bordered">
 
@@ -178,13 +182,14 @@
       </table>
       <button class="btn btn-primary" (click)="goBackToRehberList()">Go Back</button>
     </div>
-
+  </div>
   </ng-container>
 
   <ng-container *ngIf="showUserDetails" >
-
+    <div class="container mt-3">
+      <h1>Kullanıcı Listesi</h1>
     <!-- Details view -->
-    <div class="table-responsive mt-3">
+    <div class="table-responsive mt-3 text-center">
       <table class="table table-bordered">
 
         <thead>
@@ -221,6 +226,6 @@
 
       </table>
       <button class="btn btn-primary" (click)="goBackToUserList()">Go Back</button>
-    </div>
+    </div></div>
   </ng-container>
 </div>

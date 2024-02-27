@@ -24,9 +24,10 @@ export const authGuard: CanActivateFn = (route, state) => {
 
     console.log(expirationDate);
     console.log(currentTime);
-
+console.log(expirationDate<currentTime);
     if (expirationDate < currentTime) {
       //token expired
+      alert('İnaktiflikten dolayı çıkış yapılmıştır');
       userService.logout();
       return router.createUrlTree(['userislem/giris'], {
         queryParams: { returnUrl: state.url },

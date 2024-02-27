@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { userRequest } from '../../userActions/models/user.model';
 import { adminService } from '../services/admin.service';
-import { Observable, of } from 'rxjs';
+import { Observable, of, switchMap, take } from 'rxjs';
 import { rehberGoruntule } from '../../actions/models/rehber-goruntule.model';
 import { FilterService } from 'primeng/api';
+import { coreServices } from 'src/app/core/services/core-services.service';
 @Component({
   selector: 'app-admin-panel',
   templateUrl: './admin-panel.component.html',
@@ -25,7 +26,7 @@ export class AdminPanelComponent implements OnInit {
 
   constructor(
     private adminService: adminService,
-    private filterService: FilterService
+    private coreService: coreServices,
   ) {}
 
   ngOnInit(): void {
@@ -34,22 +35,7 @@ export class AdminPanelComponent implements OnInit {
     this.userRequests$ = this.adminService.userGoruntule();
   }
 
-  onUserSearch(): void {
-    if (this.userRequests$ && this.searchUserTerm !== undefined) {
-      this.userRequests$.subscribe((userRequests) => {
-        this.userRequests$ = of(
-          this.filterService.filter(
-            userRequests,
-            ['userId', 'userName', 'userEmail', 'userPassword'],
-            this.searchUserTerm,
-            'contains'
-          )
-        );
-      });
-    } else {
-      this.userRequests$ = this.adminService.userGoruntule();
-    }
-  }
+  
 
   onRehberClick(person: rehberGoruntule): void {
     this.selectedPerson = person;
@@ -71,22 +57,52 @@ export class AdminPanelComponent implements OnInit {
     this.showRehberDetails = false;
   }
 
+  clearRehberFilters(): void {
+    this.searchRehberTerm = '';  // Clear the search term
+    this.onRehberSearch();  // Trigger the search to display the original list
+  }
+  clearUserFilters(): void {
+    this.searchUserTerm = '';  // Clear the search term
+    this.onUserSearch();  // Trigger the search to display the original list
+  }
+
+  onUserSearch(): void {
+    this.userRequests$ = this.adminService.userGoruntule().pipe(
+      switchMap(userRequests => {
+        if (this.searchUserTerm && this.searchUserTerm.trim() !== '') {
+          const filteredList = this.coreService.filter(
+            userRequests,
+            ['userId', 'userName', 'userEmail', 'userPassword'],
+            this.searchUserTerm,
+            'contains'
+          );
+          return of(filteredList);
+        } else {
+          return of(userRequests);
+        }
+      })
+    );
+  }
+  
+
   onRehberSearch(): void {
-    if (this.rehberList$ && this.searchRehberTerm !== undefined) {
-      this.rehberList$.subscribe((rehberList) => {
-        this.rehberList$ = of(
-          this.filterService.filter(
+    this.rehberList$ = this.adminService.rehberGoruntule().pipe(
+      switchMap(rehberList => {
+        if (this.searchRehberTerm && this.searchRehberTerm.trim() !== '') {
+          const filteredList = this.coreService.filter(
             rehberList,
-            ['id','name', 'surname', 'email', 'phone','userId'], 
+            ['id', 'name', 'surname', 'email', 'phone', 'userId'],
             this.searchRehberTerm,
             'contains'
-          )
-        );
-      });
-    } else {
-      this.rehberList$ = this.adminService.rehberGoruntule();
-    }
+          );
+          return of(filteredList);
+        } else {
+          return of(rehberList);
+        }
+      })
+    );
   }
+  
 
   onRehberDelete(entryId: string | undefined): void {
     // Check if entryId is defined before proceeding

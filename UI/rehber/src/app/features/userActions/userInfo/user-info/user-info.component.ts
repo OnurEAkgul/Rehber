@@ -67,7 +67,11 @@ export class UserInfoComponent implements OnInit, OnDestroy {
       this.userService.userUpdateID(this.model.userId, updateObject).subscribe({
         next: () => {
           alert('User information updated successfully!');
-        },
+          localStorage.removeItem('userName');
+          localStorage.removeItem('userEmail');
+          localStorage.setItem('userName',this.model.userName);
+          localStorage.setItem('userEmail',this.model.userEmail);
+               },
         error: (error) => {
           console.error('Error updating user information:', error);
         },

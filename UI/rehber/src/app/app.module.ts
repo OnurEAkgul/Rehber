@@ -7,7 +7,7 @@ import { RehberListeComponent } from './features/actions/rehber-liste/rehber-lis
 import { RehberEkleComponent } from './features/actions/rehber-ekle/rehber-ekle.component';
 import { RehberGuncelleComponent } from './features/actions/rehber-guncelle/rehber-guncelle.component';
 import { FormsModule } from '@angular/forms';
-import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { LoginComponent } from './features/userActions/login/login.component';
 import { SignUpComponent } from './features/userActions/sign-up/sign-up.component';
 import { AdminPanelComponent } from './features/adminActions/admin-panel/admin-panel.component';
@@ -15,7 +15,9 @@ import { UserInfoComponent } from './features/userActions/userInfo/user-info/use
 import { AuthInterceptor } from './core/interceptors/auth.interceptor';
 import { AdminUserUpdateComponent } from './features/adminActions/admin-user-update/admin-user-update.component';
 import { AdminRehberUpdateComponent } from './features/adminActions/admin-rehber-update/admin-rehber-update.component';
-
+import { MenubarModule } from 'primeng/menubar';
+import { TableModule } from 'primeng/table';
+import { AppLayoutModule } from './layout/app.layout.module';
 @NgModule({
   declarations: [
     AppComponent,
@@ -28,21 +30,24 @@ import { AdminRehberUpdateComponent } from './features/adminActions/admin-rehber
     AdminPanelComponent,
     UserInfoComponent,
     AdminUserUpdateComponent,
-    AdminRehberUpdateComponent
+    AdminRehberUpdateComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     FormsModule,
     HttpClientModule,
-   
-    
+    MenubarModule,
+    TableModule,
+    AppLayoutModule,
   ],
-  providers: [{
-    provide: HTTP_INTERCEPTORS,
-    useClass: AuthInterceptor,
-    multi: true
-  }],
-  bootstrap: [AppComponent]
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true,
+    },
+  ],
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

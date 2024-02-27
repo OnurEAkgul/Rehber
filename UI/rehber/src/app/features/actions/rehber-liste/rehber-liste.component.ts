@@ -1,13 +1,13 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { RehberService } from '../services/rehber.service';
 import { rehberGoruntule } from '../models/rehber-goruntule.model';
-import { Observable, of } from 'rxjs';
+import { Observable, of, switchMap } from 'rxjs';
 import { userInformation } from '../../userActions/models/userInfo.model';
 import { UserService } from '../../userActions/user.service';
 import { Router } from '@angular/router';
 import { FilterService } from 'primeng/api';
 import { FormsModule } from '@angular/forms';
-
+import { coreServices } from 'src/app/core/services/core-services.service';
 
 @Component({
   selector: 'app-rehber-liste',
@@ -29,7 +29,8 @@ export class RehberListeComponent implements OnInit {
     private userService: UserService,
     private router: Router,
     private cdr: ChangeDetectorRef,
-    private filterService: FilterService
+    private filterService: FilterService,
+    private coreService: coreServices
   ) {}
 
   ngOnInit(): void {
@@ -89,29 +90,35 @@ export class RehberListeComponent implements OnInit {
     this.selectedPerson = person;
     this.showDetails = true;
   }
-   goBackToList(): void {
+  goBackToList(): void {
     this.showDetails = false;
     // Optionally, you can reset the selectedPerson here if needed.
   }
 
+
+  clearFilters(): void {
+    this.searchTerm = '';  // Clear the search term
+    this.onSearch();  // Trigger the search to display the original list
+  }
   onSearch(): void {
-    if (this.rehberList$ && this.searchTerm) {
-      this.rehberList$.subscribe(rehberList => {
-        this.rehberList$ = of(
-          this.filterService.filter(
+    if (this.user) {
+      this.rehberList$ = this.rehberService.rehberGoruntuleWhereId(
+        this.user.userId
+      ).pipe(
+      switchMap(rehberList => {
+        if (this.searchTerm && this.searchTerm.trim() !== '') {
+          const filteredList = this.coreService.filter(
             rehberList,
-            ['name', 'surname', 'email', 'phone'], // Include 'phone' in the fields to filter
+            ['name', 'surname', 'email', 'phone',],
             this.searchTerm,
             'contains'
-          )
-        );
-      });
-    } else {
-      if (this.user) {
-        this.rehberList$ = this.rehberService.rehberGoruntuleWhereId(
-          this.user.userId
-        );
-      }
-    }
+          );
+          return of(filteredList);
+        } else {
+          return of(rehberList);
+        }
+      })
+    );
   }
-}
+  
+}}

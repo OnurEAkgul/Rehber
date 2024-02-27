@@ -5,6 +5,8 @@
     {
         // Kullanıcının e-posta adresi.
         public string userEmail { get; set; }
+        // Kullanıcının e-posta adresi.
+        public string userName { get; set; }
 
         // Oluşturulan JWT (Json Web Token) kullanıcı tarafından alınan bir token.
         public string token { get; set; }

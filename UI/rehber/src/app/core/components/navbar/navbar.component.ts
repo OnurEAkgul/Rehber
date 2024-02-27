@@ -10,6 +10,7 @@ import { UserService } from 'src/app/features/userActions/user.service';
   styleUrls: ['./navbar.component.css'],
 })
 export class NavbarComponent implements OnInit {
+  
   user?: userInformation;
 
   constructor(private userService: UserService, private router: Router) {}
@@ -24,6 +25,7 @@ export class NavbarComponent implements OnInit {
     });
     //eğer kullanıcı girişi varsa boş olan kısıma atanıyor, hali hazırda kullanıcı varsa yine aynı şekilde veri tanımlaması yapılıyor
     this.user = this.userService.getUserFromLocalStorage();
+    
   }
 
   userLogout(): void {

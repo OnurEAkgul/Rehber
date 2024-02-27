@@ -75,7 +75,7 @@ export class RehberGuncelleComponent implements OnInit, OnDestroy {
       this.editKisiSubscription = this.rehberService
         .rehberUpdateID(this.id, rehberUpdate)
         .subscribe({
-          next: (response) => {
+          next: (response) => { 
             console.log(this.kisiBilgi?.userId);
             console.log(this.user?.userId);
             
