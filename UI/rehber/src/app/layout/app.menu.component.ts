@@ -25,7 +25,7 @@ export class AppMenuComponent implements OnInit, OnDestroy {
     this.userSubscription = this.userService.user().subscribe({
       next: (response) => {
         this.user = response;
-        console.log(this.user)
+        // console.log(this.user)
         this.model = [];
       this.updateMenu();
       },
@@ -34,7 +34,7 @@ export class AppMenuComponent implements OnInit, OnDestroy {
       },
     });
     this.user = this.userService.getUserFromLocalStorage();
-    console.log(this.user);
+    // console.log(this.user);
     
     this.model = [];
     this.updateMenu();
@@ -50,7 +50,7 @@ export class AppMenuComponent implements OnInit, OnDestroy {
   }
 
   private updateMenu() {
-    console.log(this.user);
+    // console.log(this.user);
     if (this.user == null) {
         this.model = [];
         this.model = [
@@ -98,9 +98,13 @@ export class AppMenuComponent implements OnInit, OnDestroy {
         label: 'İşlemler',
         items: [
           {
-            label: 'Admin Paneli',
+            label: 'Rehber Tablosu',
             icon: 'pi pi-fw pi-id-card',
-            routerLink: ['/admin/islem'],
+            routerLink: ['/admin/rehber'],
+          },{
+            label: 'Kullanıcı Tablosu',
+            icon: 'pi pi-fw pi-id-card',
+            routerLink: ['/admin/user'],
           },
         ],
       });

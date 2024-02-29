@@ -1,12 +1,15 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { RehberService } from '../services/rehber.service';
 import { rehberGoruntule } from '../models/rehber-goruntule.model';
-import { Observable, of, switchMap } from 'rxjs';
+import {
+  Observable,
+  of,
+  switchMap,
+} from 'rxjs';
 import { userInformation } from '../../userActions/models/userInfo.model';
 import { UserService } from '../../userActions/user.service';
 import { Router } from '@angular/router';
-import { FilterService } from 'primeng/api';
-import { FormsModule } from '@angular/forms';
+import { FilterService } from 'primeng/api';;
 import { coreServices } from 'src/app/core/services/core-services.service';
 
 @Component({
@@ -21,33 +24,40 @@ export class RehberListeComponent implements OnInit {
   user?: userInformation;
   deleteInProgress: boolean = false;
   showDetails: boolean = false;
+  rehberCount: number = 0;
   selectedPerson: rehberGoruntule | undefined;
   // loading: boolean = false;
+ 
 
   constructor(
     private rehberService: RehberService,
     private userService: UserService,
     private router: Router,
     private cdr: ChangeDetectorRef,
-    private filterService: FilterService,
     private coreService: coreServices
   ) {}
 
   ngOnInit(): void {
     this.cdr.detectChanges();
     this.user = this.userService.getUserFromLocalStorage();
-
+    
     if (this.user) {
       this.rehberList$ = this.rehberService.rehberGoruntuleWhereId(
         this.user.userId
       );
       this.rehberList$.subscribe({
         next: (response) => {
-          //console.log(response);
+          // console.log(response);
+         
+          this.rehberCount = response.length;
+          // console.log(rehberCount)
         },
       });
     } else {
     }
+
+   
+
   }
 
   onDelete(entryId: string | undefined): void {
@@ -95,30 +105,30 @@ export class RehberListeComponent implements OnInit {
     // Optionally, you can reset the selectedPerson here if needed.
   }
 
-
   clearFilters(): void {
-    this.searchTerm = '';  // Clear the search term
-    this.onSearch();  // Trigger the search to display the original list
+    this.searchTerm = ''; // Clear the search term
+    this.onSearch(); // Trigger the search to display the original list
   }
+
   onSearch(): void {
     if (this.user) {
-      this.rehberList$ = this.rehberService.rehberGoruntuleWhereId(
-        this.user.userId
-      ).pipe(
-      switchMap(rehberList => {
-        if (this.searchTerm && this.searchTerm.trim() !== '') {
-          const filteredList = this.coreService.filter(
-            rehberList,
-            ['name', 'surname', 'email', 'phone',],
-            this.searchTerm,
-            'contains'
-          );
-          return of(filteredList);
-        } else {
-          return of(rehberList);
-        }
-      })
-    );
+      this.rehberList$ = this.rehberService
+        .rehberGoruntuleWhereId(this.user.userId)
+        .pipe(
+          switchMap((rehberList) => {
+            if (this.searchTerm && this.searchTerm.trim() !== '') {
+              const filteredList = this.coreService.filter(
+                rehberList,
+                ['name', 'surname', 'email', 'phone'],
+                this.searchTerm,
+                'contains'
+              );
+              return of(filteredList);
+            } else {
+              return of(rehberList);
+            }
+          })
+        );
+    }
   }
-  
-}}
+}

@@ -25,7 +25,7 @@ namespace Rehber.API.Controllers
 
         // POST METHODU https://localhost:7195/api/Rehber
         [HttpPost("{userId:guid}")]
-        //[Authorize(Roles = "userRole")]
+        [Authorize(Roles = "userRole")]
         public async Task<IActionResult> CreateRehber([FromBody] CreateRehberRequest request, [FromRoute] Guid userId)
         {
             // DTO'dan domain modeline
@@ -54,11 +54,9 @@ namespace Rehber.API.Controllers
             return Ok(response);
         }
 
-        
-
         // GET METHODU TÜM HEPSİNİ GETİRİYOR https://localhost:7195/api/Rehber/all
         [HttpGet("all")]
-        //[Authorize(Roles = "adminRole")]
+        [Authorize(Roles = "adminRole")]
         public async Task<IActionResult> GetRehber()
         {
             var rehber = await rehberRepository.GetRehberAsync();
@@ -86,7 +84,7 @@ namespace Rehber.API.Controllers
 
         // GET METHODU USER IDYE GÖRE https://localhost:7195/api/Rehber/{userId}
         [HttpGet("{userId:guid}")]
-        //[Authorize(Roles = "userRole")]
+        [Authorize(Roles = "userRole")]
         public async Task<IActionResult> GetRehberWhereId([FromRoute] Guid userId)
         {
             var rehber = await rehberRepository.GetRehberWhereIdAsync(userId);
@@ -104,13 +102,10 @@ namespace Rehber.API.Controllers
 
             return Ok(response);
         }
-        
-        
-        
-        
+
         // ID'li GET METHODU ID'YE GÖRE GETİRİYOR https://localhost:7195/api/Rehber/userId/{id}
         [HttpGet]
-        //[Authorize(Roles = "userRole")]
+        [Authorize(Roles = "userRole")]
         [Route("{userId:guid}/{id:Guid}")]
         public async Task<IActionResult> GetRehberById([FromRoute] Guid id)
         {
@@ -136,7 +131,7 @@ namespace Rehber.API.Controllers
 
         // ID'li PUT METHODU ID'YE GÖRE GÜNCELLİYOR https://localhost:7195/api/Rehber/{id}
         [HttpPut]
-       //    [Authorize(Roles = "userRole")]
+        [Authorize(Roles = "userRole")]
         [Route("{id:Guid}")]
         public async Task<IActionResult> UpdateRehberById([FromRoute] Guid id, UpdateRehberRequestDto request)
         {
@@ -174,7 +169,7 @@ namespace Rehber.API.Controllers
 
         // ID'li DELETE METHODU ID'YE GÖRE SİLİYOR https://localhost:7195/api/Rehber/{id}
         [HttpDelete]
-        //[Authorize(Roles = "userRole")]
+        [Authorize(Roles = "userRole")]
         [Route("{id:Guid}")]
         public async Task<IActionResult> DeleteRehber([FromRoute] Guid id)
         {

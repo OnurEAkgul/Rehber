@@ -55,7 +55,7 @@ export class AdminUserUpdateComponent {
     this.userService.userUpdateID(this.userModel.userId, updateObject).subscribe({
       next: () => {
         alert('User information updated successfully!');
-        this.router.navigateByUrl('admin/islem');
+        this.router.navigateByUrl('admin/user');
       },
       error: (error) => {
         console.error('Error updating user information:', error);
@@ -70,7 +70,7 @@ export class AdminUserUpdateComponent {
       this.userService.deleteUserID(this.userModel.userId).subscribe({
         next: () => {
           alert('User deleted successfully!');
-          this.router.navigateByUrl('admin/islem');
+          this.router.navigateByUrl('admin/user');
         },
         error: (error) => {
           console.error('Error deleting user:', error);

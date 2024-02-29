@@ -14,7 +14,7 @@ export const authGuard: CanActivateFn = (route, state) => {
 
   let token = cookieService.get('Authorization');
 
-  console.log(user);
+  // console.log(user);
   if (token && user) {
     token = token.replace('Bearer', '');
     const decodedToken: any = jwtDecode(token);
@@ -24,7 +24,7 @@ export const authGuard: CanActivateFn = (route, state) => {
 
     console.log(expirationDate);
     console.log(currentTime);
-console.log(expirationDate<currentTime);
+    console.log(expirationDate<currentTime);
     if (expirationDate < currentTime) {
       //token expired
       alert('İnaktiflikten dolayı çıkış yapılmıştır');
@@ -38,8 +38,8 @@ console.log(expirationDate<currentTime);
       } else {
         //token still valid
 
-        console.log(expectedUserId);
-        console.log(user.userId);
+        // console.log(expectedUserId);
+        // console.log(user.userId);
         if (user.role.includes('userRole') && user.userId === expectedUserId) {
           return true;
         }

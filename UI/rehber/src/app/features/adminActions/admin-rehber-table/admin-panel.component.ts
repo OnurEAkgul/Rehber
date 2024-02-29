@@ -43,7 +43,7 @@ export class AdminPanelComponent implements OnInit {
     this.showUserDetails = false;
     
   }
-   goBackToRehberList(): void {
+   goBackToList(): void {
     this.showRehberDetails = false;
     this.showUserDetails = false;
   }
@@ -51,10 +51,6 @@ export class AdminPanelComponent implements OnInit {
     this.selectedUser = person;
     this.showRehberDetails = false;
     this.showUserDetails = true;
-  }
-   goBackToUserList(): void {
-    this.showUserDetails = false;
-    this.showRehberDetails = false;
   }
 
   clearRehberFilters(): void {

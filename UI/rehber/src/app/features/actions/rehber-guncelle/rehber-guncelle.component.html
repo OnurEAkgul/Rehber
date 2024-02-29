@@ -1,54 +1,73 @@
-<div class="container col-md-8 max-width-responsive"  >
+<div class="container col-md-8 max-width-responsive">
   <ng-container *ngIf="kisiBilgi; else notFound">
     <div class="row">
       <div class="col-md-8">
         <div class="mt-3" [hidden]="true">
           <label for="rehberId" class="form-label">Kişi Id</label>
-          <input type="text" disabled id="rehberId" name="rehberId" class="form-control" placeholder="{{ id }}" />
+          <input type="text" pInputText disabled id="rehberId" name="rehberId" class="form-control"
+            placeholder="{{ id }}" />
         </div>
       </div>
 
       <form #form="ngForm" (ngSubmit)="onFormSubmit()" class="">
         <div class="row g-3">
-          <div class="">
-            <div class="mt-3">
-              <label for="guncelleAdi" class="form-label">Adı</label>
-              <input type="text" id="guncelleAdi" class="form-control required" name="guncelleAdi"
+
+          <div class="mt-3">
+            <label for="guncelleAdi" class="form-label">Adı ve Soyadı</label>
+            <div class="p-inputgroup">
+              <span class="p-inputgroup-addon">
+                <i class="pi pi-user"></i>
+              </span>
+              <input type="text" pInputText id="guncelleAdi" class="form-control required" name="guncelleAdi"
                 placeholder="{{ kisiBilgi.name }}" [(ngModel)]="kisiBilgi.name" #nameInput="ngModel" required />
-              <div *ngIf="formSubmitted && nameInput.invalid" class="text-danger">
+
+              <input type="text" pInputText id="guncelleSoyadi" class="form-control required ml-3" name="guncelleSoyadi"
+                placeholder="{{ kisiBilgi.surname }}" [(ngModel)]="kisiBilgi.surname" #surnameInput="ngModel"
+                required />
+            </div>
+
+            <div class="p-inputgroup">
+              <div *ngIf="nameInput.invalid" class="text-danger">
                 Geçerli bir isim giriniz
               </div>
-            </div>
-          </div>
-
-          <div class="">
-            <div class="mt-3">
-              <label for="guncelleSoyadi" class="form-label">Soyadı</label>
-              <input type="text" id="guncelleSoyadi" class="form-control required" name="guncelleSoyadi"
-                placeholder="{{ kisiBilgi.surname }}" [(ngModel)]="kisiBilgi.surname" #surnameInput="ngModel" required />
-              <div *ngIf="formSubmitted && surnameInput.invalid" class="text-danger">
+              <div *ngIf="surnameInput.invalid" class="text-danger ml-auto">
                 Geçerli bir soyisim giriniz
               </div>
             </div>
           </div>
 
-          <div class="col-md-12">
-            <div class="mt-2">
-              <label for="guncelleEmail" class="form-label"> E-posta adresi </label>
-              <input type="text" id="guncelleEmail" class="form-control required" name="guncelleEmail"
+          <div class="mt-3"> <label for="guncelleEmail" class="form-label"> E-posta adresi </label>
+            <div class="p-inputgroup">
+              <span class="p-inputgroup-addon">
+                <i class="pi pi-at"></i>
+              </span>
+
+
+              <input type="text" pInputText id="guncelleEmail" class="form-control required" name="guncelleEmail"
                 placeholder="{{ kisiBilgi.email }}" [(ngModel)]="kisiBilgi.email" #emailInput="ngModel" required />
-              <div *ngIf="formSubmitted && emailInput.invalid" class="text-danger">
-                Geçerli bir e-posta adresi giriniz
-              </div>
+              
+
+
+            </div><div *ngIf="emailInput.invalid" class="text-danger">
+              Geçerli bir e-posta adresi giriniz
             </div>
           </div>
 
           <div class="col-md-12">
             <div class="mt-2">
-              <label class="form-label" for="guncellePhone">Telefon numarası</label>
-              <input pattern="[0-9]{3}[0-9]{3}[0-9]{4}" type="tel" id="eklePhone" class="form-control required"
-                name="eklePhone" placeholder="Telefon numarası girin" [(ngModel)]="kisiBilgi.phone"
-                (ngModelChange)="onNumericInputChange()" />
+              <span class="font-bold block mb-2">Phone</span>
+              <div class="p-inputgroup">
+                <span class="p-inputgroup-addon">
+                  <i class="pi pi-phone"></i>
+                </span>
+              <p-inputMask class="p-inputgroup col-md-3" mask="9(999) 999-9999" name="eklePhone" [(ngModel)]="kisiBilgi.phone" type="tel"
+                id="eklePhone" #phoneInput="ngModel" placeholder="0(5xx) xxx-xxxx">
+              </p-inputMask>
+            </div>
+              <div *ngIf="!onPhoneCheck()" class="text-danger">
+                Geçerli bir telefon numarası giriniz
+              </div>
+            
             </div>
           </div>
 

@@ -153,7 +153,7 @@ namespace Rehber.API.Controllers
 
         // PUT METODU UPDATE https://localhost:7195/api/user/UpdateUser/{userId}
         [HttpPut]
-        //[Authorize(Roles = "adminRole, userRole")]
+        [Authorize(Roles = "adminRole, userRole")]
         [Route("UpdateUser/{userId:guid}")]
         public async Task<IActionResult> UpdateUser([FromRoute] Guid userId, UpdateUserRequestDTO request)
         {
@@ -274,7 +274,7 @@ namespace Rehber.API.Controllers
 
         // Tüm kullanıcıları getir
         [HttpGet("all")]
-       // [Authorize(Roles = "adminRole")]
+        [Authorize(Roles = "adminRole")]
         public async Task<IActionResult> getAllUsers()
         {
             // UserManager ve UserRepository'den kullanıcıları getir
@@ -305,7 +305,7 @@ namespace Rehber.API.Controllers
 
         // DELETE METODU https://localhost:7195/api/user/DeleteUser/{userId}
         [HttpDelete]
-       // [Authorize(Roles = "userRole")]
+        [Authorize(Roles = "userRole")]
         [Route("DeleteUser/{userId:guid}")]
         public async Task<IActionResult> DeleteUser([FromRoute] Guid userId)
         {

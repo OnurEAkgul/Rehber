@@ -31,12 +31,15 @@ export class UserInfoComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    const userId = localStorage.getItem('userId');
+    
+    const userId = this.userService.getUserFromLocalStorage()?.userId;
 
     if (userId) {
       this.userInfoSubscription = this.userService.userGoruntuleID(userId).subscribe({
         next: (user) => {
           this.model = user;
+          
+          // console.log(this.model);
         },
         error: (error) => {
           console.error('Error fetching user information:', error);

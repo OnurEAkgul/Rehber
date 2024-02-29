@@ -37,16 +37,6 @@ export class AdminRehberUpdateComponent {
 
     this.user = this.userService.getUserFromLocalStorage();
     if (this.kisiBilgi) {
-      if (
-        !this.kisiBilgi.phone ||
-        this.kisiBilgi.phone.length !== 11 ||
-        !this.kisiBilgi.phone.startsWith('05') ||
-        !/^\d+$/.test(this.kisiBilgi.phone.substring(2)) // Check if the remaining part is numeric
-      ) {
-        alert('Hatalı bir numara girdiniz lütfen tekrar deneyin');
-        return;
-      }
-
       // Continue with the rest of your code for name, surname, email validations
       if (!this.isValidName(this.kisiBilgi?.name)) {
         alert('Geçerli bir isim giriniz');
@@ -60,6 +50,12 @@ export class AdminRehberUpdateComponent {
 
       if (!this.isValidEmail(this.kisiBilgi?.email)) {
         alert('Geçerli bir e-posta adresi giriniz');
+        return;
+      }
+      this.onPhoneCheck();
+      console.log(this.onPhoneCheck());
+      if (!this.isInvalidPhone(this.kisiBilgi?.phone)) {
+        alert('Geçerli bir telefon numarası giriniz');
         return;
       }
     }
@@ -80,12 +76,17 @@ export class AdminRehberUpdateComponent {
             console.log(this.kisiBilgi?.userId);
             console.log(this.user?.userId);
             
-            this.router.navigateByUrl(`admin/islem`);
+            this.router.navigateByUrl(`admin/rehber`);
           },
         });
     }
   }
-
+  onPhoneCheck() {
+    if (!this.isInvalidPhone(this.kisiBilgi?.phone)) {
+      return false;
+    }
+    return true;
+  }
   onDelete(): void {
     if (this.id) {
       const isConfirmed = window.confirm('Are you sure you want to delete this user?');
@@ -98,7 +99,7 @@ export class AdminRehberUpdateComponent {
           .rehberDeleteID(this.id)
           .subscribe({
             next: (Response) => {
-              this.router.navigateByUrl(`admin/islem`);
+              this.router.navigateByUrl(`admin/rehber`);
             },
             complete: () => {
               // Reset deleteInProgress to false when the deletion is complete
@@ -110,25 +111,25 @@ export class AdminRehberUpdateComponent {
     }
   }
 
-  onNumericInputChange(): void {
-    if (!this.formSubmitted && typeof this.kisiBilgi?.phone === 'number') {
-      // Use explicit type assertion to ensure TypeScript understands it's a number
-      const numericPhone: string = (this.kisiBilgi.phone as number).toString();
+  // onNumericInputChange(): void {
+  //   if (!this.formSubmitted && typeof this.kisiBilgi?.phone === 'number') {
+  //     // Use explicit type assertion to ensure TypeScript understands it's a number
+  //     const numericPhone: string = (this.kisiBilgi.phone as number).toString();
   
-      // Check if the phone number starts with "05" and is between 2 and 11 digits
-      const isValidLength: boolean = numericPhone.length >= 2 && numericPhone.length <= 11;
-      const isValidStart: boolean = numericPhone.startsWith('05');
+  //     // Check if the phone number starts with "05" and is between 2 and 11 digits
+  //     const isValidLength: boolean = numericPhone.length >= 2 && numericPhone.length <= 11;
+  //     const isValidStart: boolean = numericPhone.startsWith('05');
   
-      // Update the UI or handle the error based on validation result
-      if (isValidLength && !isValidStart) {
-        alert('Hatalı bir numara girdiniz lütfen tekrar deneyin');
-        return;
-      }
+  //     // Update the UI or handle the error based on validation result
+  //     if (isValidLength && !isValidStart) {
+  //       alert('Hatalı bir numara girdiniz lütfen tekrar deneyin');
+  //       return;
+  //     }
   
-      // Update the model with the numeric value
-      this.kisiBilgi.phone = numericPhone;
-    }
-  }
+  //     // Update the model with the numeric value
+  //     this.kisiBilgi.phone = numericPhone;
+  //   }
+  // }
   
   
 
@@ -175,6 +176,10 @@ export class AdminRehberUpdateComponent {
     return !!value && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
   }
 
+  private isInvalidPhone(value: string|undefined): boolean {
+    // Check if the entered phone number contains any numeric digits
+    return !!value&&/\d/.test(value ?? '');
+  }
 
 
 }

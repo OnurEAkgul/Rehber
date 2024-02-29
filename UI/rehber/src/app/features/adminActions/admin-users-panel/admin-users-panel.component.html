@@ -1,0 +1,108 @@
+<div class="container-fluid">
+
+    <ng-container *ngIf="!showUserDetails;">
+     
+      <div class="grid card">
+        <div class="container mt-3 ">
+          <h1>Kullanıcı Listesi</h1>
+  
+          <div class="d-flex align-items-center">
+            <input type="text" pInputText [(ngModel)]="searchUserTerm" (input)="onUserSearch()" />
+            <button type="button" class="btn btn-primary btn-sm m-1" (click)="clearUserFilters()">Clear Filters</button>
+          </div>
+  
+          <div class="table-responsive text-center">
+  
+            <p-table [value]="(userRequests$ | async) || []" responsiveLayout="stack" [breakpoint]="'960px'"
+              [tableStyle]="{'min-width': '50rem'}">
+              <ng-template pTemplate="header" let-columns>
+                <tr>
+                  <th>User Id</th>
+                  <th>Kullanıcı Adı</th>
+                  <th>Eposta adresi</th>
+                  <th>Şifresi</th>
+                  <th>Güncelle</th>
+                  <th>Sil</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-item let-columns="columns">
+                <tr>
+                  <td class="clickable-row" (click)="onUserClick(item)"><span class="p-column-title">User Id</span> {{
+                    item.userId.length > 25 ? (item.userId | slice: 0:25)
+                    + '...' : item.userId }}</td>
+                  <td class="clickable-row" (click)="onUserClick(item)"><span class="p-column-title">Kullanıcı
+                      Adı</span>{{
+                    item.userName .length > 25 ? (item.userName | slice:
+                    0:25) + '...' :
+                    item.userName }}</td>
+                  <td class="clickable-row" (click)="onUserClick(item)"><span class="p-column-title">Eposta
+                      adresi</span>{{
+                    item.userEmail.length > 25 ? (item.userEmail | slice:
+                    0:20) + (item.userEmail.length >
+                    28 ? '...' + item.userEmail.slice(-10) : '') : item.userEmail }}</td>
+                  <td class="clickable-row" (click)="onUserClick(item)"><span class="p-column-title">Şifresi</span>{{
+                    item.userPassword.length > 25 ? (item.userPassword | slice:
+                    0:25) + '...' : item.userPassword
+                    }}</td>
+  
+                  <td>
+                    <a class="btn btn-light" [routerLink]="['/admin/user/guncelle/user/', item.userId]">Güncelle</a>
+                  </td>
+  
+                  <td>
+                    <p-button icon="pi pi-trash" [rounded]="true" severity="danger" (click)="onUserDelete(item.userId)"
+                      [disabled]="deleteInProgress">
+                  </p-button>
+                  </td>
+  
+                </tr>
+              </ng-template>
+            </p-table>
+  
+          </div>
+        </div>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="showUserDetails">
+      <div class="grid card">
+        <!-- User Details View -->
+        <div class="container mt-3">
+          <h1>Kullanıcı Listesi</h1>
+  
+  
+  
+  
+        <p-table *ngIf="selectedUser" [value]="[selectedUser]" [tableStyle]="{ 'min-width': '50rem' }">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>User Id</th>
+              <th>Kullanıcı Adı</th>
+              <th>Eposta adresi</th>
+              <th>Şifresi</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-product>
+            <tr>
+              <td>{{ selectedUser.userId.length ? (selectedUser.userId | slice: 0:25) : selectedUser.userId}}
+              </td>
+              <td>{{ selectedUser.userName.length ? (selectedUser.userName | slice: 0:25) :
+                selectedUser.userName}}</td>
+              <td>{{ selectedUser.userEmail
+                ? selectedUser.userEmail.length > 25
+                ? (selectedUser.userEmail | slice: 0:20) +
+                (selectedUser.userEmail.length > 28 ? '...' + selectedUser.userEmail.slice(-10) : '')
+                : selectedUser.userEmail
+                : 'N/A' }}</td>
+              <td>{{ selectedUser.userPassword.length ? (selectedUser.userPassword | slice: 0:25) :
+                selectedUser.userPassword}}</td>  
+          
+          </tr>
+          </ng-template>
+  
+        </p-table>
+        <button class="btn btn-primary mt-3" (click)="goBackToList()">Go Back</button>
+      </div>
+    </div>
+    </ng-container>
+  
+  </div>

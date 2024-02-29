@@ -40,17 +40,6 @@ export class RehberEkleComponent implements OnDestroy,OnInit {
   onFormSubmit() {
     // Set the formSubmitted flag to true
     this.formSubmitted = true;
-  
-    // Remove non-numeric characters from the phone number
-    this.model.phone = this.model.phone.replace(/[^0-9]/g, '');
-  
-    // Validate if the phone number is exactly 11 digits and starts with "05"
-    if (this.model.phone.length !== 11 || !this.model.phone.startsWith('05')) {
-      // Show an error message to the user
-      alert('Hatalı bir numara girdiniz lütfen tekrar deneyin');
-      return; // Stop the form submission
-    }
-  
     // Additional validation for name, surname, and email
     if (!this.isValidName(this.model.name)) {
       alert('Geçerli bir isim giriniz');
@@ -67,6 +56,12 @@ export class RehberEkleComponent implements OnDestroy,OnInit {
       return;
     }
   
+    this.onPhoneCheck();
+    console.log(this.onPhoneCheck());
+    if (!this.isInvalidPhone(this.model.phone)) {
+      alert('Geçerli bir telefon numarası giriniz');
+      return;
+    }
 
     if(this.user){
     // Continue with the API call if all validations pass
@@ -100,6 +95,12 @@ export class RehberEkleComponent implements OnDestroy,OnInit {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
   }
 
+  onPhoneCheck() {
+    if (!this.isInvalidPhone(this.model.phone)) {
+      return false;
+    }
+    return true;
+  }
   onNumericInputChange(): void {
     // Do not check for validation if the form has been submitted
     if (!this.formSubmitted) {
@@ -121,6 +122,10 @@ export class RehberEkleComponent implements OnDestroy,OnInit {
 
   ngOnDestroy(): void {
     this.rehberEkleSubscription?.unsubscribe();
+  }
+  private isInvalidPhone(value: string|undefined): boolean {
+    // Check if the entered phone number contains any numeric digits
+    return !!value&&/\d/.test(value ?? '');
   }
 }
   

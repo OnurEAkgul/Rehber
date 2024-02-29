@@ -41,13 +41,13 @@ export class LoginComponent implements OnInit {
 
 
     this.userInfo= this.userService.getUserFromLocalStorage();
-    console.log(this.userInfo)
+    // console.log(this.userInfo)
     if (this.userInfo) {
       if (this.userInfo.role.includes('adminRole')) {
-        console.log(this.userInfo)
-        this.router.navigateByUrl('admin/islem');
+        // console.log(this.userInfo)
+        this.router.navigateByUrl('admin/rehber');
       } else {
-        console.log(this.userInfo)
+        // console.log(this.userInfo)
         this.router.navigateByUrl(`islem/goruntule/${this.userInfo.userId}`);
       }
     }
@@ -66,12 +66,7 @@ export class LoginComponent implements OnInit {
           // Alert for successful login
           this.cookieService.set(
             'Authorization',
-            `Bearer ${response.token}`,
-            undefined,
-            '/',
-            undefined,
-            true,
-            'Strict'
+            `Bearer ${response.token}`
           );
 
           //set local user
@@ -83,11 +78,11 @@ export class LoginComponent implements OnInit {
             token: response.token,
           });
           if (response.role.includes('adminRole')) {
-            this.router.navigate(['admin/islem']);
+            this.router.navigate(['admin/rehber']);
             alert('Login successful!');
           } else {
             alert('Login successful!');
-            console.log('info'+response.userId);
+            // console.log('info'+response.userId);
             this.router.navigate(['islem/goruntule/', response.userId]);
           }
           // this.router.navigate(['/userislem/info', response.userId]);
@@ -95,7 +90,8 @@ export class LoginComponent implements OnInit {
           // Your existing success logic here
         },
         error: (error) => {
-          console.error('Sign in failed:', error);
+          
+          // console.error('Sign in failed:', error);
 
           // Provide user-friendly error messages based on the error received
           if (error.status === 401) {

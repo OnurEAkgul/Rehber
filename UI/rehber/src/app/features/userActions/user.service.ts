@@ -16,7 +16,7 @@ import { CookieService } from 'ngx-cookie-service';
 })
 export class UserService {
   $userInfo = new BehaviorSubject<userInformation | undefined>(undefined);
- 
+
   constructor(private http: HttpClient, private cookieService: CookieService) {}
 
   userEkle(model: signupRequest): Observable<userRequest> {
@@ -30,7 +30,6 @@ export class UserService {
     return this.http.post<loginResponse>(
       `${environment.apiBaseUrl}/api/user/Login`,
       {
-        
         userEmail: model.userEmail,
         userPassword: model.userPassword,
       }
@@ -39,32 +38,37 @@ export class UserService {
 
   setUser(user: userInformation): void {
     this.$userInfo.next(user);
+    localStorage.setItem('user', JSON.stringify(user));
 
-    localStorage.setItem('userEmail',user.userEmail);
-    localStorage.setItem('userName', user.userName);
-    localStorage.setItem('userId', user.userId);
-    localStorage.setItem('token', user.token);
-    localStorage.setItem('role', user.role.join(','));
+    // localStorage.setItem('userEmail',user.userEmail);
+    // localStorage.setItem('userName', user.userName);
+    // localStorage.setItem('userId', user.userId);
+    // localStorage.setItem('token', user.token);
+    // localStorage.setItem('role', user.role.join(','));
   }
 
   getUserFromLocalStorage(): userInformation | undefined {
-    const userEmail = localStorage.getItem('userEmail');
-    const userName = localStorage.getItem('userName');
-    const userId = localStorage.getItem('userId');
-    const token = localStorage.getItem('token');
-    const roleString = localStorage.getItem('role');
+    const userString = localStorage.getItem('user');
+    if (!userString) return undefined;
 
-    if (userEmail&&userName && userId && token && roleString) {
-      const roles = roleString.split(','); // Convert comma-separated string to array
-      return { userEmail,userId, userName, token, role: roles };
-    }
+    return JSON.parse(userString) as userInformation;
+    // const userEmail = localStorage.getItem('userEmail');
+    // const userName = localStorage.getItem('userName');
+    // const userId = localStorage.getItem('userId');
+    // const token = localStorage.getItem('token');
+    // const roleString = localStorage.getItem('role');
+
+    // if (userEmail&&userName && userId && token && roleString) {
+    //   const roles = roleString.split(','); // Convert comma-separated string to array
+    //   return { userEmail,userId, userName, token, role: roles };
+    // }
 
     // If any of the required information is missing, return 'undefined'
     return undefined;
   }
   logout(): void {
     localStorage.clear();
-    this.cookieService.delete('Authorization', '/');
+    this.cookieService.delete('Authorization');
     this.$userInfo.next(undefined);
   }
   user(): Observable<userInformation | undefined> {
@@ -104,8 +108,6 @@ export class UserService {
       `${environment.apiBaseUrl}/api/user/DeleteUser/${userId}?addAuth=true`
     );
   }
-
-  
 
   /**/
 }

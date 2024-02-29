@@ -4,6 +4,10 @@
     <form #form="ngForm" (ngSubmit)="onSignIn()" class="row g-3">
       <div class="col-md-6">
         <label class="form-label">Email</label>
+        <div class="p-inputgroup">
+          <span class="p-inputgroup-addon">
+            <i class="pi pi-at"></i>
+          </span>
         <input
           type="text"
           id="signInInput"
@@ -14,13 +18,18 @@
           #signInInput="ngModel"
           required
         />
-        <div *ngIf="formSubmitted && signInInput.invalid" class="text-danger">
+        </div>
+        <div *ngIf="signInInput.touched && signInInput.invalid" class="text-danger">
           Please enter a valid email or username
         </div>
       </div>
   
       <div class="col-md-6">
         <label class="form-label">Password</label>
+        <div class="p-inputgroup">
+          <span class="p-inputgroup-addon">
+            <i class="pi pi-lock"></i>
+          </span>
         <input
           type="password"
           id="signInPassword"
@@ -31,7 +40,8 @@
           #passwordInput="ngModel"
           required
         />
-        <div *ngIf="formSubmitted && passwordInput.invalid" class="text-danger">
+        </div>
+        <div *ngIf="passwordInput.touched && passwordInput.invalid" class="text-danger">
           Please enter a valid password
         </div>
       </div>

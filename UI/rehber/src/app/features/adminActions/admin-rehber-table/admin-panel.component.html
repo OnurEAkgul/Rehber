@@ -1,0 +1,102 @@
+<div class="container-fluid">
+
+  <ng-container *ngIf="!showRehberDetails ">
+    <div class="grid card">
+      <div class="container mt-3">
+        <h1>Rehber Listesi</h1>
+
+        <div class="d-flex align-items-center">
+          <input type="text" pInputText [(ngModel)]="searchRehberTerm" (input)="onRehberSearch()" />
+          <button type="button" class="btn btn-primary btn-sm m-1" (click)="clearRehberFilters()">Clear Filters</button>
+        </div>
+        <p-table [value]="(rehberList$ | async) || []" responsiveLayout="stack" [breakpoint]="'960px'"
+          [tableStyle]="{'min-width': '50rem'}">
+          <ng-template pTemplate="header" let-columns>
+            <tr>
+              <th>Name</th>
+              <th>Surname</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Güncelle</th>
+              <th>Sil</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-item let-columns="columns">
+            <tr>
+              <td class="clickable-row" (click)="onRehberClick(item)"><span class="p-column-title">Name</span> {{
+                item.name.length > 25 ? (item.name | slice: 0:25)
+                + '...' : item.name }}</td>
+              <td class="clickable-row" (click)="onRehberClick(item)"><span class="p-column-title">Surname</span>{{
+                item.surname.length > 25 ? (item.surname | slice:
+                0:25) + '...' :
+                item.surname }}</td>
+              <td class="clickable-row" (click)="onRehberClick(item)"><span class="p-column-title">Email</span>{{
+                item.email.length > 25 ? (item.email | slice:
+                0:20) + (item.email.length >
+                28 ? '...' + item.email.slice(-10) : '') : item.email }}</td>
+              <td class="clickable-row" (click)="onRehberClick(item)"><span class="p-column-title">Phone</span>{{
+                item.phone.length > 25 ? (item.phone | slice:
+                0:25) + '...' : item.phone
+                }}</td>
+              <td>
+                <a class="btn btn-light" [routerLink]="['/admin/rehber/guncelle/rehber', item.userId, item.id]">Güncelle</a>
+              </td>
+
+              <td>
+                <p-button icon="pi pi-trash" [rounded]="true" severity="danger" (click)="onRehberDelete(item.id)"
+                  [disabled]="deleteInProgress">
+
+
+                </p-button>
+              </td>
+
+            </tr>
+          </ng-template>
+        </p-table>
+
+
+
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="showRehberDetails">
+    <div class="grid card">
+      <!--Rehber Details View -->
+      <div class="container mt-3">
+        <h1>Rehber Listesi</h1>
+        <p-table *ngIf="selectedPerson" [value]="[selectedPerson]" [tableStyle]="{ 'min-width': '50rem' }">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Name</th>
+              <th>Surname</th>
+              <th>Email</th>
+              <th>Phone</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-product>
+            <tr>
+              <td>{{ selectedPerson.name.length ? (selectedPerson.name | slice: 0:25) : selectedPerson.name}}
+              </td>
+              <td>{{ selectedPerson.surname.length ? (selectedPerson.surname | slice: 0:25) :
+                selectedPerson.surname}}</td>
+              <td>{{ selectedPerson.email
+                ? selectedPerson.email.length > 25
+                ? (selectedPerson.email | slice: 0:20) +
+                (selectedPerson.email.length > 28 ? '...' + selectedPerson.email.slice(-10) : '')
+                : selectedPerson.email
+                : 'N/A' }}</td>
+              <td>{{ selectedPerson.phone.length ? (selectedPerson.phone | slice: 0:25) :
+                selectedPerson.phone}}</td>
+            </tr>
+          </ng-template>
+
+        </p-table>
+        <button class="btn btn-primary mt-3" (click)="goBackToList()">Go Back</button>
+      </div>
+    </div>
+  </ng-container>
+
+ 
+
+</div>
